@@ -1,0 +1,1976 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live 12 Theme-O-Matic</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iOCIgZmlsbD0iIzJiMmIyYiIvPjxyZWN0IHg9IjkiIHk9IjE2IiB3aWR0aD0iMy4yIiBoZWlnaHQ9IjE2IiBmaWxsPSIjY2Q1NDQzIi8+PHJlY3QgeD0iMTQiIHk9IjE2IiB3aWR0aD0iMy4yIiBoZWlnaHQ9IjE2IiBmaWxsPSIjYWM3MzNjIi8+PHJlY3QgeD0iMTkiIHk9IjE2IiB3aWR0aD0iMy4yIiBoZWlnaHQ9IjE2IiBmaWxsPSIjYmRhODVhIi8+PHJlY3QgeD0iMjQiIHk9IjE2IiB3aWR0aD0iMy4yIiBoZWlnaHQ9IjE2IiBmaWxsPSIjNGQ2OTVlIi8+PHJlY3QgeD0iMzAiIHk9IjE2IiB3aWR0aD0iOSIgaGVpZ2h0PSIzLjIiIGZpbGw9IiNlOGU4ZTgiLz48cmVjdCB4PSIzMCIgeT0iMjAuMyIgd2lkdGg9IjkiIGhlaWdodD0iMy4yIiBmaWxsPSIjZThlOGU4Ii8+PHJlY3QgeD0iMzAiIHk9IjI0LjYiIHdpZHRoPSI5IiBoZWlnaHQ9IjMuMiIgZmlsbD0iI2U4ZThlOCIvPjxyZWN0IHg9IjMwIiB5PSIyOC45IiB3aWR0aD0iOSIgaGVpZ2h0PSIzLjIiIGZpbGw9IiNlOGU4ZTgiLz48L3N2Zz4=">
+<style>
+/* Three-column app: Simple (left) | Preview (centre) | Advanced (right). Each pane scrolls; page does not. */
+:root{
+  --bg:#1c1c1c; --panel:#262626; --panel2:#2f2f2f; --line:#3a3a3a;
+  --fg:#e4e4e4; --dim:#9a9a9a; --accent:#ff9c39; --accent2:#03c3d5;
+  --radius:5px; --mono:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:13px;overflow:hidden}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+h1{font-size:14px;margin:0;font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* toolbar */
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:9px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+.toolbar h1{margin-right:4px}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius);padding:6px 12px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:#555;background:#363636}
+.btn.primary{background:var(--accent);color:#1a1a1a;border-color:var(--accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.fname{background:#1a1a1a;border:1px solid var(--line);border-radius:var(--radius);padding:6px 8px;width:180px}
+
+/* folder nav (in toolbar) */
+.navbtn{background:var(--panel2);border:1px solid var(--line);border-radius:5px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1;flex:none}
+.navbtn:hover:not(:disabled){border-color:#555}
+.navbtn:disabled{opacity:.4;cursor:default}
+.pos{font-family:var(--mono);color:var(--dim);min-width:58px;text-align:center;font-size:12px}
+.themelist{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;height:40px;align-items:center;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.themelist::-webkit-scrollbar{height:7px}
+.themelist::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.themelist::-webkit-scrollbar-track{background:transparent}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:4px 11px;white-space:nowrap;cursor:pointer;color:var(--dim);font-size:12px;flex:none}
+.chip:hover{border-color:#555;color:var(--fg)}
+.chip.on{background:var(--accent);color:#1a1a1a;border-color:var(--accent);font-weight:600}
+
+/* main three columns */
+.main{display:flex;flex:1;min-height:0}
+.pane{overflow-y:auto;min-height:0}
+.simple-pane{width:360px;flex:none;border-right:1px solid var(--line);padding:14px}
+.preview-pane{flex:1;min-width:0;background:#111;display:flex;flex-direction:column;align-items:center;padding:18px;overflow:auto}
+.pane-title{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);margin:0 0 10px;font-weight:600}
+.pvtitle{align-self:flex-start;margin:0 0 10px}
+.adv-pane{width:360px;flex:none;border-left:1px solid var(--line);padding:12px;display:flex;flex-direction:column}
+
+/* simple controls */
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:14px;margin-bottom:12px}
+.grp h3{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lock{background:none;border:0;cursor:pointer;color:var(--dim);padding:2px;display:inline-flex;align-items:center;opacity:.6;transition:opacity .12s,color .12s}
+.lock:hover{opacity:1}
+.lock.on{color:var(--accent);opacity:1}
+.grp p{margin:0 0 12px;color:var(--dim);font-size:11.5px;line-height:1.45}
+.sliderrow{display:grid;grid-template-columns:74px 1fr 38px 24px;align-items:center;gap:9px;margin:11px 0}
+.sliderrow input[type=range]{width:100%}
+.sliderrow .val{font-family:var(--mono);color:var(--dim);text-align:right;font-size:12px}
+/* gradient slider tracks */
+input[type=range].grad{-webkit-appearance:none;appearance:none;height:14px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);outline:none;cursor:pointer}
+input[type=range].grad::-webkit-slider-runnable-track{height:14px;border-radius:7px;background:transparent}
+input[type=range].grad::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;margin-top:-1px;border-radius:50%;background:#fff;border:1px solid #333;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+input[type=range].grad::-moz-range-track{height:14px;border-radius:7px;background:transparent}
+input[type=range].grad::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#fff;border:1px solid #333;box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.rowsw{width:24px;height:16px;border-radius:3px;border:1px solid var(--line);background:var(--panel2)}
+.reset{background:none;border:0;color:var(--accent2);cursor:pointer;font-size:11px;padding:2px 4px}
+.resetrow{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:6px;font-size:11px;color:var(--dim)}
+.resetrow .reset{border:1px solid var(--line);border-radius:4px}
+.resetrow .reset:hover{border-color:var(--accent2)}
+.reset:hover{text-decoration:underline}
+.swatchrow{display:flex;align-items:center;gap:12px;margin:9px 0}
+.swatchrow label{width:78px;flex:none}
+.swatchrow .count{color:var(--dim);font-size:11px;margin-left:auto}
+.bigsw{width:44px;height:28px;border:1px solid var(--line);border-radius:5px;padding:0;background:none;cursor:pointer}
+.bigsw::-webkit-color-swatch-wrapper{padding:2px}
+.bigsw::-webkit-color-swatch{border:0;border-radius:3px}
+.hexin{width:90px;background:#1a1a1a;border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-family:var(--mono);font-size:12px}
+
+/* advanced */
+.adv-pane h2{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);margin:0 0 8px;font-weight:600}
+.search{width:100%;background:#1a1a1a;border:1px solid var(--line);border-radius:var(--radius);padding:7px 10px;margin-bottom:8px;flex:none}
+.advhint{color:var(--dim);font-size:11px;line-height:1.5;margin:0 0 12px}
+#secs{overflow-y:auto;min-height:0}
+.row.flash{animation:rowflash 1.6s ease-out}
+@keyframes rowflash{0%{background:rgba(91,140,255,.5)}60%{background:rgba(91,140,255,.22)}100%{background:transparent}}
+#pv [data-key]{cursor:pointer}
+details.sec{border:1px solid var(--line);border-radius:6px;margin-bottom:8px;background:var(--panel);overflow:hidden}
+details.sec>summary{cursor:pointer;padding:9px 12px;font-weight:600;list-style:none;user-select:none;display:flex;align-items:center;gap:8px;font-size:12px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:"\25B8";color:var(--dim);transition:transform .12s}
+details.sec[open]>summary::before{transform:rotate(90deg)}
+details.sec>summary .n{color:var(--dim);font-weight:400;font-size:11px;margin-left:auto}
+.rows{padding:4px 12px 12px}
+.row{display:flex;align-items:center;gap:9px;padding:3px 0}
+.row .sw{width:28px;height:20px;border:1px solid var(--line);border-radius:4px;padding:0;background:none;cursor:pointer;flex:none}
+.row .sw::-webkit-color-swatch-wrapper{padding:2px}
+.row .sw::-webkit-color-swatch{border:0;border-radius:2px}
+.row .hex{width:82px;background:#1a1a1a;border:1px solid var(--line);border-radius:4px;padding:4px 6px;font-family:var(--mono);font-size:11px;flex:none}
+.row .nm{color:var(--fg);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .val{width:90px;background:#1a1a1a;border:1px solid var(--line);border-radius:4px;padding:4px 6px;font-family:var(--mono);font-size:11px;flex:none}
+
+/* ===== PREVIEW: mock Session view, themed from --t-* vars ===== */
+#pv{width:1100px;flex:none;border:1px solid #000;border-radius:4px;overflow:hidden;font-size:11px;
+  background:var(--t-Desktop,#393939);color:var(--t-ControlForeground,#e0e0e0);font-family:var(--sans);user-select:none;display:flex;flex-direction:column}
+#pv .bar{display:flex;align-items:center;gap:9px;padding:6px 10px;background:var(--t-SurfaceBackground,#4f4f4f);border-bottom:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .dot{width:13px;height:13px;border-radius:50%}
+#pv .play{background:var(--t-ChosenPlay,#00d38d)}
+#pv .rec{background:var(--t-ChosenRecord,#ff5559)}
+#pv .sq{width:12px;height:12px;border:1px solid var(--t-ControlForeground,#e0e0e0);border-radius:2px;opacity:.6}
+#pv .tempo{font-family:var(--mono);background:var(--t-ControlBackground,#424242);padding:2px 8px;border-radius:3px}
+#pv .pill{background:var(--t-ChosenDefault,#ff9c39);color:var(--t-ControlOnForeground,#080808);padding:2px 8px;border-radius:3px;font-weight:600}
+#pv .dimtxt{color:var(--t-TextDisabled,#a7a7a7)}
+#pv .body{display:flex;flex:1;min-height:420px}
+#pv .browser{width:132px;flex:none;background:var(--t-BrowserBar,#4f4f4f);border-right:1px solid var(--t-ControlContrastFrame,#151515);padding:6px 0}
+#pv .browser .hd{padding:5px 10px 2px;color:var(--t-TreeColumnHeadControl,#a7a7a7);text-transform:uppercase;font-size:9px;letter-spacing:.5px}
+#pv .browser .brow{padding:3px 10px;color:var(--t-ControlForeground,#e0e0e0)}
+#pv .browser .brow.dim{color:var(--t-TextDisabled,#a7a7a7)}
+#pv .browser .brow.sel{background:var(--t-SelectionBackground,#96d4e8);color:var(--t-SelectionForeground,#080808)}
+#pv .session{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--t-SurfaceArea,#2a2a2a)}
+#pv .grid{display:flex;flex:1;min-height:0}
+#pv .col{flex:1;min-width:0;border-right:2px solid var(--t-ControlContrastFrame,#151515);display:flex;flex-direction:column;background:var(--t-SurfaceArea,#2a2a2a)}
+#pv .col.ret{flex:none;width:68px;background:var(--t-SurfaceAreaFocus,#2a2a2a)}
+#pv .col.master{flex:none;width:84px;background:var(--t-SurfaceBackground,#4f4f4f)}
+#pv .th{padding:4px 6px;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--t-SurfaceHighlight,#686868);border-bottom:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .th.ret{background:var(--t-ChosenAlternative,#03c3d5);color:var(--t-ControlOnForeground,#080808)}
+#pv .cell{height:19px;border-bottom:2px solid var(--t-GridLineBase,#0e0e0e);padding:2px 3px}
+#pv .cell .cb{height:100%;border-radius:2px;background:var(--t-ClipSlotButton,#2a2a2a);display:flex;align-items:center;gap:4px;padding:0 5px;font-size:10px;overflow:hidden;white-space:nowrap}
+#pv .cell.ret .cb{background:transparent}
+#pv .cell .cb.clip{color:var(--t-ClipText,#000);border:1px solid var(--t-ClipBorder,#393939)}
+#pv .cell .tri{font-size:7px;color:var(--t-ControlForeground,#e0e0e0);opacity:.5}
+#pv .cell .cb.clip .tri{color:var(--t-ControlOnForeground,#080808);opacity:1}
+#pv .cell.sel .cb{outline:2px solid var(--t-SelectionBackground,#96d4e8);outline-offset:-1px}
+#pv .cell.scene .cb{background:var(--t-ControlBackground,#424242);justify-content:center;font-size:8px;color:var(--t-ControlForeground,#e0e0e0)}
+#pv .mix{display:flex;background:var(--t-SurfaceBackground,#4f4f4f);border-top:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .mcol{flex:1;min-width:0;border-right:1px solid var(--t-ControlContrastFrame,#151515);padding:5px 3px;display:flex;flex-direction:column;align-items:center;gap:4px}
+#pv .mcol.ret{flex:none;width:68px}
+#pv .mcol.master{flex:none;width:84px}
+#pv .act{display:flex;gap:2px;align-items:center;height:13px}
+#pv .act b{min-width:14px;height:13px;padding:0 2px;border-radius:2px;background:var(--t-ChosenDefault,#ff9c39);color:var(--t-ControlOnForeground,#080808);font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
+#pv .act s{width:13px;height:13px;border-radius:2px;background:var(--t-ControlBackground,#424242);color:var(--t-ControlForeground,#e0e0e0);font-size:8px;display:flex;align-items:center;justify-content:center;text-decoration:none}
+#pv .act s.armed{background:var(--t-ChosenRecord,#ff5559);color:var(--t-ControlOnForeground,#080808)}
+#pv .knob{width:18px;height:18px;border-radius:50%;background:var(--t-ControlBackground,#424242);border:1px solid var(--t-ControlContrastFrame,#151515);position:relative}
+#pv .knob::after{content:"";position:absolute;left:50%;top:2px;width:2px;height:6px;background:var(--t-ChosenDefault,#ff9c39);transform:translateX(-50%)}
+#pv .fadrow{display:flex;gap:3px;align-items:flex-end;height:46px}
+#pv .fader{width:8px;height:100%;background:var(--t-ControlBackground,#424242);border-radius:2px;position:relative}
+#pv .fader i{position:absolute;left:-2px;right:-2px;height:4px;background:var(--t-ControlFillHandle,#878787);border-radius:2px}
+#pv .meter{width:5px;height:100%;border-radius:2px;background:var(--meter-grad,linear-gradient(to top,#00f758,#ffd100,#ff0a0a))}
+#pv .detail{display:flex;align-items:center;gap:8px;background:var(--t-DisplayBackground,#1f1f1f);border-top:1px solid var(--t-ControlContrastFrame,#151515);padding:6px 10px;font-family:var(--mono);font-size:10px}
+#pv .dev{padding:3px 10px;border-radius:3px;background:var(--t-SurfaceHighlight,#686868);color:var(--t-ControlForeground,#e0e0e0)}
+#pv .retro{color:var(--t-RetroDisplayForeground,#ff9c39)}
+#pv .retro2{color:var(--t-RetroDisplayForeground2,#03c3d5)}
+
+/* detail-view tabs + MIDI note editor (piano roll) */
+#pv .dtabs{display:flex;gap:2px;background:var(--t-SurfaceBackground,#4f4f4f);border-top:1px solid var(--t-ControlContrastFrame,#151515);padding:4px 6px 0}
+#pv .dtab{padding:4px 12px;font-size:10px;border-radius:4px 4px 0 0;background:var(--t-ControlBackground,#424242);color:var(--t-TextDisabled,#a7a7a7);cursor:pointer}
+#pv .dtab.on{background:var(--t-DisplayBackground,#1f1f1f);color:var(--t-ControlForeground,#e0e0e0)}
+#pv .dpane{display:none}
+#pv .dpane.on{display:block;box-shadow:inset 0 0 0 1px var(--t-MainViewFocusIndicator,#151515)}
+#pv .proll{display:flex;flex-direction:column;background:var(--t-DetailViewBackground,#686868);border-top:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .prbody{display:flex;height:150px}
+#pv .keys{width:46px;flex:none;display:flex;flex-direction:column;background:var(--t-PianoKeySeparator,#4f4f4f)}
+#pv .key{flex:1;min-height:0;border-bottom:1px solid var(--t-PianoKeySeparator,#4f4f4f);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;font-size:7px}
+#pv .key.white{background:var(--t-PianoWhiteKey,#e0e0e0);color:#222}
+#pv .key.black{background:var(--t-PianoBlackKey,#313131);color:var(--t-TextDisabled,#a7a7a7)}
+#pv .nwrap{flex:1;min-width:0;display:flex;flex-direction:column}
+#pv .ngrid{flex:1;position:relative;background:var(--t-DetailViewBackground,#686868);overflow:hidden}
+#pv .nrow{position:absolute;left:0;right:0;border-bottom:1px solid var(--t-MidiEditorBackgroundWhiteKeySeparator,#14141419)}
+#pv .nrow.black{background:var(--t-MidiEditorBlackKeyBackground,#0a0a0a19)}
+#pv .nrow.scale{box-shadow:inset 3px 0 0 var(--t-ScaleAwareness,#b595fc)}
+#pv .gline{position:absolute;top:0;bottom:0;width:2px;background:var(--t-GridLineBase,#09090954)}
+#pv .gline.bar{width:2px;background:var(--t-GridGuideline,#e0e0e0);opacity:.5}
+#pv .loopbar{height:9px;background:var(--t-DetailGridTiles,#0a0a0a19);border-bottom:1px solid var(--t-ControlContrastFrame,#151515);position:relative}
+#pv .loopbar .lb{position:absolute;top:0;bottom:0;border:1px solid var(--t-LoopColor,#080808);border-radius:2px;background:var(--t-LoopColor,#080808);opacity:.55}
+#pv .loopbar .lbl{position:absolute;top:1px;font-size:7px;color:var(--t-DetailViewRulerMarkings,#c6c6c6);font-family:var(--mono)}
+#pv .note{position:absolute;height:6px;border-radius:1px;transform:translateY(-50%);background:var(--t-Clip1,#ff9c39);box-shadow:inset 0 0 0 1px var(--t-ClipBorder,#393939)}
+#pv .note.sel{box-shadow:inset 0 0 0 1px var(--t-SelectionBackground,#96d4e8),0 0 0 1px var(--t-SelectionBackground,#96d4e8)}
+#pv .vel{height:34px;flex:none;background:var(--t-DetailViewBackground,#686868);border-top:1px solid var(--t-ControlContrastFrame,#151515);position:relative;margin-left:46px}
+#pv .vel .vb{position:absolute;bottom:0;width:3px;background:var(--t-VelocityColor,#e95449);border-radius:1px 1px 0 0}
+#pv .vel .vb.sel{background:var(--t-VelocitySelectedOrHovered,#5b8cff)}
+#pv .vel .vb i{position:absolute;top:-2px;left:50%;width:4px;height:4px;border-radius:50%;background:inherit;transform:translateX(-50%)}
+
+/* view tabs (Session / Arrangement) */
+.pvtabs{align-self:flex-start;display:flex;gap:4px;margin-bottom:8px}
+.pvtab{padding:5px 14px;font-size:12px;border:1px solid var(--line);border-bottom:0;border-radius:6px 6px 0 0;background:var(--panel);color:var(--dim);cursor:pointer}
+.pvtab.on{background:var(--panel2);color:var(--fg);font-weight:600}
+#pv .stage{flex:1;min-width:0;display:flex;flex-direction:column}
+#pv .view{display:none}
+#pv .view.on{display:flex;flex:1;min-height:0}
+
+/* arrangement view */
+#pv .arr{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--t-SurfaceArea,#2a2a2a)}
+#pv .aruler{display:flex;height:16px;background:var(--t-SurfaceBackground,#4f4f4f);border-bottom:1px solid var(--t-ControlContrastFrame,#151515);position:relative}
+#pv .aruler .loc{flex:1;border-right:1px solid var(--t-GridLineBase,#09090954);font-size:8px;font-family:var(--mono);color:var(--t-DetailViewRulerMarkings,#c6c6c6);padding:2px 0 0 3px}
+#pv .aruler .brace{position:absolute;top:0;height:4px;background:var(--t-ArrangementLoop,var(--t-ChosenDefault,#ff9c39))}
+#pv .atracks{flex:1;display:flex;flex-direction:column;min-height:0}
+#pv .atrk{display:flex;flex:1;min-height:0;border-bottom:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .ahead{width:104px;flex:none;background:var(--t-SurfaceHighlight,#686868);border-right:1px solid var(--t-ControlContrastFrame,#151515);padding:3px 5px;font-size:9px;display:flex;align-items:center;gap:4px;overflow:hidden;white-space:nowrap}
+#pv .atrk.seltrk .ahead{background:var(--t-SurfaceAreaFocus,#3a3a3a)}
+#pv .ahead .tdot{width:8px;height:8px;border-radius:2px;flex:none}
+#pv .ahead s{margin-left:auto;width:12px;height:11px;border-radius:2px;background:var(--t-ControlBackground,#424242);color:var(--t-ControlForeground,#e0e0e0);font-size:7px;display:flex;align-items:center;justify-content:center}
+#pv .ahead s.on{background:var(--t-ChosenRecord,#ff5559);color:var(--t-ControlOnForeground,#080808)}
+#pv .alane{flex:1;min-width:0;position:relative;background:var(--t-ArrangerGridTiles,#0a0a0a19)}
+#pv .alane::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 12.5%,rgba(255,255,255,.035) 12.5% 25%);pointer-events:none}
+#pv .alane .gl{position:absolute;top:0;bottom:0;width:2px;background:var(--t-GridLineBase,#09090954);opacity:.6}
+#pv .alane .gl.bar{width:2px;background:var(--t-GridGuideline,#e0e0e0);opacity:.3}
+#pv .aclip{position:absolute;top:3px;bottom:3px;border-radius:2px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--t-ClipBorder,#393939);display:flex;align-items:flex-start}
+#pv .aclip .cn{font-size:8px;padding:1px 3px;color:var(--t-ClipText,#000);white-space:nowrap;overflow:hidden}
+#pv .aclip.sel{box-shadow:inset 0 0 0 1px var(--t-SelectionBackground,#96d4e8),0 0 0 1px var(--t-SelectionBackground,#96d4e8)}
+#pv .aclip .wave{position:absolute;left:0;right:0;bottom:1px;top:11px}
+#pv .aclip .note{position:absolute;height:2px;background:var(--t-ClipText,#000);opacity:.55;border-radius:0}
+#pv .playhead{position:absolute;top:0;bottom:0;width:1px;background:var(--t-ChosenPlay,#00d38d)}
+
+/* from-image palette generator */
+#imgpanel .drop{border:1px dashed var(--line,#555);border-radius:6px;padding:14px;text-align:center;font-size:11px;color:var(--muted,#999);cursor:pointer;transition:border-color .15s,background .15s}
+#imgpanel .drop:hover,#imgpanel .drop.over{border-color:var(--accent,#2a9fd6);background:rgba(127,127,127,.08)}
+#imgpanel .stage{position:relative;margin-top:8px;display:none}
+#imgpanel .stage.has{display:block}
+#imgpanel canvas{display:block;width:100%;border-radius:5px}
+#imgpanel .dot{position:absolute;width:19px;height:19px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.5);transform:translate(-50%,-50%);cursor:grab;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000}
+#imgpanel .dot:active{cursor:grabbing}
+#imgpanel .strip{display:flex;gap:4px;margin-top:8px}
+#imgpanel .strip .sw{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+#imgpanel .strip .sw .col{height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+#imgpanel .strip .sw .col b{font-size:9px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000,0 0 2px #000}
+#imgpanel .strip .sw .col .x{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,.4);text-shadow:0 1px 2px #000;border-radius:4px}
+#imgpanel .strip .sw label{font-size:9px;color:var(--dim);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+#imgpanel .gen{margin-top:9px;width:100%}
+
+/* sample / audio clip editor */
+#pv .samped{display:flex;flex-direction:column;background:var(--t-DetailViewBackground,#686868);border-top:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .samped .loopbar{height:9px;background:var(--t-DetailGridTiles,#0a0a0a19);border-bottom:1px solid var(--t-ControlContrastFrame,#151515);position:relative}
+#pv .samped .loopbar .lb{position:absolute;top:0;bottom:0;border:1px solid var(--t-LoopColor,#080808);background:var(--t-LoopColor,#080808);opacity:.55;border-radius:2px}
+#pv .sampbody{height:150px;position:relative;overflow:hidden;background:var(--t-DetailViewBackground,#686868)}
+#pv .sampbody .sgl{position:absolute;top:0;bottom:0;width:2px;background:var(--t-GridLineBase,#09090954)}
+#pv .sampbody .sgl.bar{background:var(--t-GridGuideline,#e0e0e0);opacity:.35}
+#pv .swave{position:absolute;inset:0}
+#pv .whot{position:absolute;top:11px;bottom:0}
+#pv .warp{position:absolute;top:0;width:1px;height:11px;background:var(--t-ControlForeground,#e0e0e0);opacity:.45}
+#pv .warp i{position:absolute;top:0;left:-2px;width:5px;height:4px;background:var(--t-ChosenDefault,#ff9c39)}
+#pv .samped .ruler{display:flex;height:14px;background:var(--t-DetailViewBackground,#686868)}
+#pv .samped .ruler .loc{flex:1;border-right:1px solid var(--t-GridLineBase,#09090954);font-size:7px;font-family:var(--mono);color:var(--t-DetailViewRulerMarkings,#c6c6c6);padding:1px 0 0 3px}
+
+/* drum rack (device view) */
+#pv .devbody{display:flex;gap:10px;padding:9px 10px;background:var(--t-DisplayBackground,#1f1f1f);border-top:1px solid var(--t-ControlContrastFrame,#151515);align-items:stretch}
+#pv .drack{display:flex;gap:2px}
+#pv .padgrid{display:grid;grid-template-columns:repeat(4,22px);grid-template-rows:repeat(4,22px);gap:3px}
+#pv .pad{border-radius:3px;background:var(--t-ControlBackground,#424242);font-size:6px;color:var(--t-ControlForeground,#e0e0e0);display:flex;align-items:flex-end;padding:2px;overflow:hidden;line-height:1}
+#pv .pad.filled{background:var(--t-FilledDrumRackPad,#6c6c6c);color:var(--t-ControlOnForeground,#080808)}
+#pv .pad.sel{box-shadow:inset 0 0 0 2px var(--t-SelectionBackground,#96d4e8)}
+#pv .drack .scroller{width:9px;display:flex;flex-direction:column;border-radius:2px;overflow:hidden}
+#pv .drack .scroller i{flex:1;background:var(--t-DrumRackScroller1,#5c5c5c)}
+#pv .drack .scroller i:nth-child(even){background:var(--t-DrumRackScroller2,#454545)}
+#pv .devchain{flex:1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;align-content:flex-start}
+#pv .devchain .retro{color:var(--t-RetroDisplayForeground,#ff9c39);font-family:var(--mono);font-size:10px}
+#pv .devchain .retro2{color:var(--t-RetroDisplayForeground2,#03c3d5);font-family:var(--mono);font-size:10px}
+#pv .devchain .dimtxt{color:var(--t-TextDisabled,#a7a7a7);font-family:var(--mono);font-size:10px}
+
+/* arrangement automation sub-lane */
+#pv .autolane{display:flex;flex:none;height:40px;border-bottom:1px solid var(--t-ControlContrastFrame,#151515)}
+#pv .autohead{width:104px;flex:none;background:var(--t-SurfaceHighlight,#686868);border-right:1px solid var(--t-ControlContrastFrame,#151515);padding:3px 6px;font-size:8px;color:var(--t-ControlForeground,#e0e0e0);display:flex;align-items:center;gap:4px;overflow:hidden;white-space:nowrap}
+#pv .autohead .sw{width:7px;height:7px;border-radius:2px;background:var(--t-AutomationColor,#ff5559);flex:none}
+#pv .autobody{flex:1;min-width:0;position:relative;background:var(--t-ArrangerGridTiles,#0a0a0a19)}
+#pv .autobody .agl{position:absolute;top:0;bottom:0;width:1px;background:var(--t-AutomationGrid,#09090954)}
+#pv .autobody svg{position:absolute;inset:0;width:100%;height:100%}
+#pv .autobody .bp{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--t-AutomationColor,#ff5559);transform:translate(-50%,-50%);box-shadow:0 0 0 1px var(--t-DisplayBackground,#1f1f1f)}
+.pvcaption{color:var(--dim);font-size:11px;text-align:center;margin-top:10px;max-width:900px}
+
+@media (max-width:1000px){
+  body{overflow:auto}
+  .app{height:auto;min-height:100%}
+  .main{flex-direction:column}
+  .pane{overflow:visible}
+  .simple-pane,.adv-pane{width:100%;flex:none;border:0;border-bottom:1px solid var(--line)}
+  #secs{overflow:visible}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toolbar">
+    <h1>Live&nbsp;12 Theme-O-Matic</h1>
+    <button class="btn" id="browseFolder">Browse folder&hellip;</button>
+    <input id="loadfolder" type="file" webkitdirectory directory multiple hidden>
+    <button id="prevTheme" class="navbtn" title="Previous (left arrow)" disabled>&lsaquo;</button>
+    <span id="themePos" class="pos">&mdash;</span>
+    <button id="nextTheme" class="navbtn" title="Next (right arrow)" disabled>&rsaquo;</button>
+    <div id="themeList" class="themelist"></div>
+    <button class="btn" id="undoBtn" title="Undo (Cmd/Ctrl-Z)" disabled>&#8630; Undo</button>
+    <button class="btn" id="redoBtn" title="Redo (Shift-Cmd/Ctrl-Z)" disabled>Redo &#8631;</button>
+    <label class="btn" for="loadfile">Load&nbsp;.ask</label>
+    <input id="loadfile" type="file" accept=".ask,.xml" hidden>
+    <input id="fname" class="fname" value="My Theme" spellcheck="false" title="Save filename (Ableton names the theme from the filename)">
+    <button class="btn primary" id="save">Save&nbsp;.ask</button>
+  </div>
+
+  <div class="main">
+    <div class="pane simple-pane">
+      <h2 class="pane-title">Basic</h2>
+      <div class="grp">
+        <h3><span>Surfaces</span><button class="lock" data-lock="surfaces" title="Lock Surfaces - keep these while loading other themes"></button></h3>
+        <p>Generate a theme from a base colour map it across all of Live.</p>
+        <p>Adjust the global Hue and Saturation then use Brightness and Contrast to raise/lower and squash/expand the brightness.</p>
+        <div class="sliderrow"><label>Hue</label><input type="range" class="grad" id="surfH" min="0" max="360" value="0" style="background:linear-gradient(90deg,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000)"><span class="val" id="surfHv">0&deg;</span><span class="rowsw" id="surfHueSw" title="Base hue at full saturation"></span></div>
+        <div class="sliderrow"><label>Saturation</label><input type="range" class="grad" id="surfS" min="0" max="100" value="0"><span class="val" id="surfSv">0</span><span class="rowsw" id="surfSSw" title="Grey to full hue"></span></div>
+        <div class="sliderrow"><label>Brightness</label><input type="range" class="grad" id="surfL" min="-40" max="40" value="0" style="background:linear-gradient(90deg,#0a0a0a,#f0f0f0)"><span class="val" id="surfLv">0</span><span class="rowsw" id="surfLSw" title="Dark to light"></span></div>
+        <div class="sliderrow"><label>Contrast</label><input type="range" class="grad" id="surfC" min="-60" max="60" value="0" style="background:linear-gradient(90deg,#5b5b5b,#2a2a2a 50%,#f0f0f0)"><span class="val" id="surfCv">0</span><span class="rowsw" id="surfCSw" title="Ladder spread"></span></div>
+        <div class="resetrow"><span>Reset to:</span><button class="reset" data-reset="loaded">Loaded</button><button class="reset" data-reset="dark">Default dark</button><button class="reset" data-reset="light">Default light</button></div>
+      </div>
+      <div class="grp">
+        <h3><span>Text</span><button class="lock" data-lock="text" title="Lock Text - keep these while loading other themes"></button></h3>
+        <p>Shift all of Live's text brightness up or down.</p>
+        <div class="sliderrow"><label>Brightness</label><input type="range" class="grad" id="textL" min="-40" max="40" value="0" style="background:linear-gradient(90deg,#0a0a0a,#f0f0f0)"><span class="val" id="textLv">0</span><span class="rowsw" id="textLSw" title="Dark to light"></span></div>
+      </div>
+      <div class="grp">
+        <h3><span>Accents</span><button class="lock" data-lock="accents" title="Lock Accents - keep these while loading other themes"></button></h3>
+        <p>Update every use of an accent colour across the theme.</p>
+        <div id="roleSwatches"></div>
+        <div class="resetrow"><span>Reset to:</span><button class="reset" data-areset="loaded">Loaded</button><button class="reset" data-areset="default">Default</button></div>
+      </div>
+      <div class="grp" id="imgpanel">
+        <h3>From image</h3>
+        <p>Generate a palette from a photo, drag the swatches around to adjust.</p>
+        <p>Edited colours outside of a photo's palette display as an X.</p>
+        <div class="drop" id="imgdrop">Drop an image or click to choose</div>
+        <input id="imgfile" type="file" accept="image/*" hidden>
+        <div class="stage" id="imgstage"><canvas id="imgcanvas"></canvas></div>
+        <div class="strip" id="imgstrip"></div>
+        <button class="btn primary gen" id="imggen" disabled>Apply palette</button>
+      </div>
+    </div>
+
+    <div class="preview-pane">
+      <h2 class="pane-title pvtitle">Preview</h2>
+      <div class="pvtabs"><span class="pvtab on" data-view="session">Session</span><span class="pvtab" data-view="arr">Arrangement</span></div>
+      <div id="pv"></div>
+    </div>
+
+    <div class="pane adv-pane">
+      <h2>Advanced</h2>
+      <input class="search" id="search" placeholder="Filter keys&hellip;" spellcheck="false">
+      <p class="advhint">Remap every colour in Live's UI, use this to fine tune your theme after setting up Basic options to the left.</p>
+      <div id="secs"></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/xml" id="theme-dark"><?xml version="1.0" encoding="UTF-8"?>
+<Ableton MajorVersion="5" MinorVersion="12.0_12120" SchemaChangeCount="4" Creator="Ableton Live 12.1d1" Revision="">
+	<Theme>
+		<ControlForeground Value="#b5b5b5" />
+		<TextDisabled Value="#757575" />
+		<ControlDisabled Value="#757575" />
+		<MeterBackground Value="#181818" />
+		<SurfaceHighlight Value="#464646" />
+		<SurfaceArea Value="#242424" />
+		<Desktop Value="#2a2a2a" />
+		<ViewCheckControlEnabledOn Value="#ffad56" />
+		<ScrollbarInnerHandle Value="#696969" />
+		<ScrollbarInnerTrack Value="#00000000" />
+		<ScrollbarLCDHandle Value="#696969" />
+		<ScrollbarLCDTrack Value="#363636" />
+		<ScrollbarMixerShowOnScrollHandle Value="#00000066" />
+		<DetailViewBackground Value="#3e3e3e" />
+		<PreferencesTab Value="#363636" />
+		<SelectionFrame Value="#757575" />
+		<ControlBackground Value="#1e1e1e" />
+		<ControlFillHandle Value="#5d5d5d" />
+		<ChosenDefault Value="#ffad56" />
+		<ChosenRecord Value="#ff5559" />
+		<ChosenPreListen Value="#3c6ab6" />
+		<ImplicitArm Value="#ff000064" />
+		<RangeDefault Value="#03c3d5" />
+		<RangeDisabled Value="#757575" />
+		<RangeDisabledOff Value="#636363" />
+		<LearnMidi Value="#4034ef" />
+		<LearnKey Value="#ff6400" />
+		<LearnMacro Value="#00da48" />
+		<RangeEditField Value="#007383" />
+		<RangeEditField2 Value="#a03c4c" />
+		<BipolReset Value="#03c3d5" />
+		<ChosenAlternative Value="#03c3d5" />
+		<ChosenAlert Value="#e76942" />
+		<ChosenPlay Value="#00d38d" />
+		<Clip1 Value="#8b7936" />
+		<Clip2 Value="#999565" />
+		<Clip3 Value="#b8ce93" />
+		<Clip4 Value="#afb95b" />
+		<Clip5 Value="#52ba46" />
+		<Clip6 Value="#81d24c" />
+		<Clip7 Value="#6baace" />
+		<Clip8 Value="#4881aa" />
+		<Clip9 Value="#954eb2" />
+		<Clip10 Value="#ff5f80" />
+		<Clip11 Value="#dc4848" />
+		<Clip12 Value="#d66b18" />
+		<Clip13 Value="#e0aa2a" />
+		<Clip14 Value="#ffec75" />
+		<Clip15 Value="#e7e6e6" />
+		<Clip16 Value="#a0a0a0" />
+		<ClipText Value="#000000" />
+		<ClipBorder Value="#2a2a2a" />
+		<SceneContrast Value="#2a2a2a" />
+		<SelectionBackground Value="#b0ddeb" />
+		<StandbySelectionBackground Value="#637e86" />
+		<SelectionForeground Value="#070707" />
+		<StandbySelectionForeground Value="#070707" />
+		<SelectionBackgroundContrast Value="#7a959e" />
+		<SurfaceBackground Value="#363636" />
+		<TakeLaneTrackHighlighted Value="#3e3e3e" />
+		<TakeLaneTrackNotHighlighted Value="#303030" />
+		<AutomationColor Value="#ff4d47" />
+		<AutomationGrid Value="#0b0b0b" />
+		<LoopColor Value="#919191" />
+		<OffGridLoopColor Value="#8888884f" />
+		<ArrangementRulerMarkings Value="#919191" />
+		<DetailViewRulerMarkings Value="#919191" />
+		<ShadowDark Value="#24242454" />
+		<ShadowLight Value="#2b2b2bcc" />
+		<DisplayBackground Value="#181818" />
+		<AbletonColor Value="#00ff00" />
+		<WaveformColor Value="#171717ef" />
+		<DimmedWaveformColor Value="#696969df" />
+		<VelocityColor Value="#e95449" />
+		<VelocitySelectedOrHovered Value="#5b8cff" />
+		<NoteProbability Value="#636363" />
+		<Alert Value="#e76942" />
+		<ControlOnForeground Value="#070707" />
+		<ControlOffForeground Value="#b5b5b5" />
+		<ControlOnDisabledForeground Value="#242424" />
+		<ControlOffDisabledForeground Value="#696969" />
+		<ControlOnAlternativeForeground Value="#070707" />
+		<ControlTextBack Value="#242424" />
+		<ControlContrastFrame Value="#111111" />
+		<ControlSelectionFrame Value="#919191" />
+		<ControlContrastTransport Value="#363636" />
+		<ViewControlOn Value="#ffad56" />
+		<ViewControlOff Value="#464646" />
+		<Progress Value="#ffad56" />
+		<ProgressText Value="#636363" />
+		<TransportProgress Value="#ffad56" />
+		<ClipSlotButton Value="#1e1e1e" />
+		<BrowserBar Value="#363636" />
+		<BrowserBarOverlayHintTextColor Value="#5d5d5d" />
+		<BrowserDisabledItem Value="#757575" />
+		<BrowserSampleWaveform Value="#868686" />
+		<AutomationDisabled Value="#646464" />
+		<AutomationMouseOver Value="#ff9085" />
+		<MidiNoteMaxVelocity Value="#e95449" />
+		<RetroDisplayBackground Value="#181818" />
+		<RetroDisplayBackgroundLine Value="#3e3e3e" />
+		<RetroDisplayForeground Value="#ffad56" />
+		<RetroDisplayForeground2 Value="#03c3d5" />
+		<RetroDisplayForegroundDisabled Value="#868686" />
+		<RetroDisplayGreen Value="#ffad56" />
+		<RetroDisplayRed Value="#03c3d5" />
+		<RetroDisplayHandle1 Value="#ffad56" />
+		<RetroDisplayHandle2 Value="#ff697f" />
+		<RetroDisplayScaleText Value="#868686" />
+		<RetroDisplayTitle Value="#b5b5b5" />
+		<ThresholdLineColor Value="#03c3d5" />
+		<GainReductionLineColor Value="#ffad56" />
+		<InputCurveColor Value="#535353" />
+		<InputCurveOutlineColor Value="#00000000" />
+		<OutputCurveColor Value="#8686864c" />
+		<OutputCurveOutlineColor Value="#bfbfbf" />
+		<SpectrumDefaultColor Value="#535353" />
+		<SpectrumAlternativeColor Value="#3c6ab6" />
+		<SpectrumGridLines Value="#b6b6b63f" />
+		<Operator1 Value="#e0d825" />
+		<Operator2 Value="#29d6cd" />
+		<Operator3 Value="#6571f6" />
+		<Operator4 Value="#f3751b" />
+		<DrumRackScroller1 Value="#464646" />
+		<DrumRackScroller2 Value="#696969" />
+		<FilledDrumRackPad Value="#b5b5b5" />
+		<SurfaceAreaFocus Value="#242424" />
+		<FreezeColor Value="#4391e6" />
+		<GridLabel Value="#b5b5b57f" />
+		<GridLineBase Value="#06060654" />
+		<ArrangerGridTiles Value="#0a0a0a19" />
+		<DetailGridTiles Value="#0a0a0a19" />
+		<GridGuideline Value="#b5b5b5" />
+		<OffGridGuideline Value="#b5b5b54f" />
+		<TreeColumnHeadBackground Value="#464646" />
+		<TreeColumnHeadForeground Value="#b5b5b5" />
+		<TreeColumnHeadSelected Value="#464646" />
+		<TreeColumnHeadFocus Value="#464646" />
+		<TreeColumnHeadControl Value="#757575" />
+		<TreeRowCategoryForeground Value="#757575" />
+		<TreeRowCategoryBackground Value="#00000000" />
+		<BrowserTagBackground Value="#242424" />
+		<SearchIndication Value="#ecca6d" />
+		<SearchIndicationStandby Value="#ccaa66" />
+		<KeyZoneBackground Value="#acf6b4" />
+		<KeyZoneCrossfadeRamp Value="#28bd56" />
+		<VelocityZoneBackground Value="#f5a7a3" />
+		<VelocityZoneCrossfadeRamp Value="#e95449" />
+		<SelectorZoneBackground Value="#bed6f4" />
+		<SelectorZoneCrossfadeRamp Value="#2d66d2" />
+		<ViewCheckControlEnabledOff Value="#757575" />
+		<ViewCheckControlDisabledOn Value="#868686" />
+		<ViewCheckControlDisabledOff Value="#5d5d5d" />
+		<DefaultBlendFactor Value="0.7570000291" />
+		<IconBlendFactor Value="0.7300000191" />
+		<ClipBlendFactor Value="0.7580000162" />
+		<NoteBorderStandbyBlendFactor Value="0.5360000134" />
+		<RetroDisplayBlendFactor Value="1" />
+		<CheckControlNotCheckedBlendFactor Value="0.5" />
+		<MixSurfaceAreaBlendFactor Value="0.375" />
+		<TextFrameSegmentBlendFactor Value="0.3950000107" />
+		<NoteDisabledSelectedBlendFactor Value="0.5" />
+		<BackgroundClip Value="#5d5d5d" />
+		<BackgroundClipFrame Value="#363636" />
+		<WarperTimeBarRulerBackground Value="#363636" />
+		<WarperTimeBarMarkerBackground Value="#303030" />
+		<MinVelocityNoteBlendFactor Value="0.2639999986" />
+		<StripedBackgroundShadeFactor Value="0.8999999762" />
+		<NonEditableAutomationAlpha Value="127" />
+		<DisabledContextMenuIconAlpha Value="85" />
+		<ClipBorderAlpha Value="120" />
+		<ScrollBarAlpha Value="255" />
+		<ScrollBarOnHoverAlpha Value="255" />
+		<ScrollBarBackgroundAlpha Value="255" />
+		<InaudibleTakeLightness Value="0.322000000000000008" />
+		<InaudibleTakeSaturation Value="0.775000000000000022" />
+		<InaudibleTakeNameLightness Value="0.800000000000000044" />
+		<InaudibleTakeNameSaturation Value="0.853999999999999981" />
+		<AutomationLaneClipBodyLightness Value="0.260000000000000009" />
+		<AutomationLaneClipBodySaturation Value="0.80600000000000005" />
+		<AutomationLaneHeaderLightness Value="0.251000000000000001" />
+		<AutomationLaneHeaderSaturation Value="0.53400000000000003" />
+		<TakeLaneHeaderLightness Value="0.479999999999999982" />
+		<TakeLaneHeaderSaturation Value="0.900000000000000022" />
+		<TakeLaneHeaderNameLightness Value="0.849999999999999978" />
+		<TakeLaneHeaderNameSaturation Value="0.900000000000000022" />
+		<AutomationLaneHeaderNameLightness Value="0.708999999999999964" />
+		<AutomationLaneHeaderNameSaturation Value="0.900000000000000022" />
+		<ClipContrastColorAdjustment Value="24" />
+		<SessionSlotOklabLCompensationFactor Value="20" />
+		<BipolarPotiTriangle Value="#111111" />
+		<Poti Value="#111111" />
+		<DeactivatedPoti Value="#2a2a2a" />
+		<PotiNeedle Value="#181818" />
+		<DeactivatedPotiNeedle Value="#2a2a2a" />
+		<PianoBlackKey Value="#464646" />
+		<PianoWhiteKey Value="#868686" />
+		<PianoKeySeparator Value="#464646" />
+		<TransportOffBackground Value="#363636" />
+		<TransportOffDisabledForeground Value="#696969" />
+		<TransportOffForeground Value="#b5b5b5" />
+		<TransportSelectionBackground Value="#5d5d5d" />
+		<Modulation Value="#009aac" />
+		<ModulationDisabled Value="#79bdc7a9" />
+		<ModulationMouseOver Value="#8cffff" />
+		<AutomationTransformToolFrame Value="#292929bf" />
+		<AutomationTransformToolFrameActive Value="#0b0b0b" />
+		<AutomationTransformToolHandle Value="#292929bf" />
+		<AutomationTransformToolHandleActive Value="#0b0b0b" />
+		<MutedAuditionClip Value="#636363" />
+		<LinkedTrackHover Value="#b3d4e5" />
+		<ExpressionLaneHeaderHighlight Value="#3e3e3e" />
+		<DeactivatedClipHeader Value="#696969df" />
+		<DeactivatedClipHeaderForeground Value="#2a2a2a" />
+		<ScaleAwareness Value="#b595fc" />
+		<StandardVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ff0a0a" />
+			<ZeroDecibel Value="#ff0a0a" />
+			<BelowZeroDecibel1 Value="#ffd100" />
+			<BelowZeroDecibel2 Value="#00f758" />
+			<Minimum Value="#00f758" />
+		</StandardVuMeter>
+		<OverloadVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffffff" />
+			<ZeroDecibel Value="#ffffff" />
+			<BelowZeroDecibel1 Value="#ffffff" />
+			<BelowZeroDecibel2 Value="#ffffff" />
+			<Minimum Value="#af0a0a" />
+		</OverloadVuMeter>
+		<DisabledVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffd00a" />
+			<ZeroDecibel Value="#828282" />
+			<BelowZeroDecibel1 Value="#7e7e7e" />
+			<BelowZeroDecibel2 Value="#7b7b7b" />
+			<Minimum Value="#6e6e6e" />
+		</DisabledVuMeter>
+		<HeadphonesVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#a5a5f1" />
+			<AboveZeroDecibel Value="#90aaec" />
+			<ZeroDecibel Value="#90aaec" />
+			<BelowZeroDecibel1 Value="#85b8f1" />
+			<BelowZeroDecibel2 Value="#7cc6f5" />
+			<Minimum Value="#0affff" />
+		</HeadphonesVuMeter>
+		<SendsOnlyVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#c8c800" />
+			<AboveZeroDecibel Value="#c8c800" />
+			<ZeroDecibel Value="#6464ff" />
+			<BelowZeroDecibel1 Value="#6464ff" />
+			<BelowZeroDecibel2 Value="#6464ff" />
+			<Minimum Value="#6464ff" />
+		</SendsOnlyVuMeter>
+		<BipolarGainReductionVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#5577c6" />
+			<AboveZeroDecibel Value="#5577c6" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</BipolarGainReductionVuMeter>
+		<OrangeVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ffa519" />
+			<AboveZeroDecibel Value="#ffa519" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</OrangeVuMeter>
+		<MainViewFocusIndicator Value="#757575" />
+		<MidiEditorBlackKeyBackground Value="#07070726" />
+		<MidiEditorBackgroundWhiteKeySeparator Value="#0a0a0a19" />
+		<RangeEditField3 Value="#7b5732" />
+		<ScrollbarInnerHandleHover Value="#757575" />
+		<ScrollbarInnerTrackHover Value="#242424" />
+		<ScrollbarLCDHandleHover Value="#757575" />
+		<ScrollbarLCDTrackHover Value="#464646" />
+		<ScrollbarMixerShowOnScrollHandleHover Value="#0000007f" />
+		<RetroDisplayControlSelectionFrame Value="#5d5d5d" />
+		<ThresholdLineColorHover Value="#5b8cff" />
+		<SecondarySelectionForeground Value="#0000007f" />
+	</Theme>
+</Ableton></script>
+<script type="application/xml" id="theme-light"><?xml version="1.0" encoding="UTF-8"?>
+<Ableton MajorVersion="5" MinorVersion="12.0_12120" SchemaChangeCount="4" Creator="Ableton Live 12.1d1" Revision="">
+	<Theme>
+		<ControlForeground Value="#121212" />
+		<TextDisabled Value="#6e6e6e" />
+		<ControlDisabled Value="#f1f1f1" />
+		<MeterBackground Value="#242424" />
+		<SurfaceHighlight Value="#bcbcbc" />
+		<SurfaceArea Value="#6e6e6e" />
+		<Desktop Value="#818181" />
+		<ViewCheckControlEnabledOn Value="#ffb901" />
+		<ScrollbarInnerHandle Value="#5b5b5b" />
+		<ScrollbarInnerTrack Value="#00000000" />
+		<ScrollbarLCDHandle Value="#4f4f4f" />
+		<ScrollbarLCDTrack Value="#3d3d3d" />
+		<ScrollbarMixerShowOnScrollHandle Value="#00000066" />
+		<DetailViewBackground Value="#c6c6c6" />
+		<PreferencesTab Value="#a5a5a5" />
+		<SelectionFrame Value="#3d3d3d" />
+		<ControlBackground Value="#cfcfcf" />
+		<ControlFillHandle Value="#cfcfcf" />
+		<ChosenDefault Value="#ffb901" />
+		<ChosenRecord Value="#ff595f" />
+		<ChosenPreListen Value="#1a7df1" />
+		<ImplicitArm Value="#ff000064" />
+		<RangeDefault Value="#00eeff" />
+		<RangeDisabled Value="#f1f1f1" />
+		<RangeDisabledOff Value="#636363" />
+		<LearnMidi Value="#4034ef" />
+		<LearnKey Value="#ff6400" />
+		<LearnMacro Value="#00da48" />
+		<RangeEditField Value="#00cadb" />
+		<RangeEditField2 Value="#f87680" />
+		<BipolReset Value="#00eeff" />
+		<ChosenAlternative Value="#00eeff" />
+		<ChosenAlert Value="#ff7d43" />
+		<ChosenPlay Value="#00faa3" />
+		<Clip1 Value="#8b7936" />
+		<Clip2 Value="#999565" />
+		<Clip3 Value="#b8ce93" />
+		<Clip4 Value="#afb95b" />
+		<Clip5 Value="#52ba46" />
+		<Clip6 Value="#81d24c" />
+		<Clip7 Value="#6baace" />
+		<Clip8 Value="#4881aa" />
+		<Clip9 Value="#954eb2" />
+		<Clip10 Value="#ff5f80" />
+		<Clip11 Value="#dc4848" />
+		<Clip12 Value="#d66b18" />
+		<Clip13 Value="#e0aa2a" />
+		<Clip14 Value="#ffec75" />
+		<Clip15 Value="#e7e6e6" />
+		<Clip16 Value="#a0a0a0" />
+		<ClipText Value="#000000" />
+		<ClipBorder Value="#000000" />
+		<SceneContrast Value="#636363" />
+		<SelectionBackground Value="#cdf8ff" />
+		<StandbySelectionBackground Value="#abc6cb" />
+		<SelectionForeground Value="#121212" />
+		<StandbySelectionForeground Value="#121212" />
+		<SelectionBackgroundContrast Value="#afcfd4" />
+		<SurfaceBackground Value="#a5a5a5" />
+		<TakeLaneTrackHighlighted Value="#bcbcbc" />
+		<TakeLaneTrackNotHighlighted Value="#9c9c9c" />
+		<AutomationColor Value="#ea3c3c" />
+		<AutomationGrid Value="#121212" />
+		<LoopColor Value="#3d3d3d" />
+		<OffGridLoopColor Value="#24293364" />
+		<ArrangementRulerMarkings Value="#3d3d3d" />
+		<DetailViewRulerMarkings Value="#3d3d3d" />
+		<ShadowDark Value="#12121254" />
+		<ShadowLight Value="#8a8a8acc" />
+		<DisplayBackground Value="#5b5b5b" />
+		<AbletonColor Value="#00ff00" />
+		<WaveformColor Value="#222222ef" />
+		<DimmedWaveformColor Value="#5a5a5adf" />
+		<VelocityColor Value="#e95449" />
+		<VelocitySelectedOrHovered Value="#5b8cff" />
+		<NoteProbability Value="#636363" />
+		<Alert Value="#ff7d43" />
+		<ControlOnForeground Value="#121212" />
+		<ControlOffForeground Value="#121212" />
+		<ControlOnDisabledForeground Value="#121212" />
+		<ControlOffDisabledForeground Value="#6e6e6e" />
+		<ControlOnAlternativeForeground Value="#121212" />
+		<ControlTextBack Value="#dfdfdf" />
+		<ControlContrastFrame Value="#4f4f4f" />
+		<ControlSelectionFrame Value="#4f4f4f" />
+		<ControlContrastTransport Value="#a5a5a5" />
+		<ViewControlOn Value="#ffb901" />
+		<ViewControlOff Value="#a5a5a5" />
+		<Progress Value="#ffb901" />
+		<ProgressText Value="#636363" />
+		<TransportProgress Value="#ffb901" />
+		<ClipSlotButton Value="#5b5b5b" />
+		<BrowserBar Value="#a5a5a5" />
+		<BrowserBarOverlayHintTextColor Value="#4f4f4f" />
+		<BrowserDisabledItem Value="#4f4f4f" />
+		<BrowserSampleWaveform Value="#6e6e6e" />
+		<AutomationDisabled Value="#595959" />
+		<AutomationMouseOver Value="#891a1c" />
+		<MidiNoteMaxVelocity Value="#e95449" />
+		<RetroDisplayBackground Value="#242424" />
+		<RetroDisplayBackgroundLine Value="#5b5b5b" />
+		<RetroDisplayForeground Value="#ffb901" />
+		<RetroDisplayForeground2 Value="#00eeff" />
+		<RetroDisplayForegroundDisabled Value="#a5a5a5" />
+		<RetroDisplayGreen Value="#ffb901" />
+		<RetroDisplayRed Value="#00eeff" />
+		<RetroDisplayHandle1 Value="#ffb901" />
+		<RetroDisplayHandle2 Value="#f87680" />
+		<RetroDisplayScaleText Value="#cfcfcf7f" />
+		<RetroDisplayTitle Value="#cfcfcf" />
+		<ThresholdLineColor Value="#00eeff" />
+		<GainReductionLineColor Value="#ffb901" />
+		<InputCurveColor Value="#bcbcbc54" />
+		<InputCurveOutlineColor Value="#00000000" />
+		<OutputCurveColor Value="#cecece3f" />
+		<OutputCurveOutlineColor Value="#cfcfcf" />
+		<SpectrumDefaultColor Value="#bcbcbc54" />
+		<SpectrumAlternativeColor Value="#1a7df1" />
+		<SpectrumGridLines Value="#a6a6a63f" />
+		<Operator1 Value="#e0d825" />
+		<Operator2 Value="#29d6cd" />
+		<Operator3 Value="#6571f6" />
+		<Operator4 Value="#f3751b" />
+		<DrumRackScroller1 Value="#898989" />
+		<DrumRackScroller2 Value="#6e6e6e" />
+		<FilledDrumRackPad Value="#cfcfcf" />
+		<SurfaceAreaFocus Value="#6e6e6e" />
+		<FreezeColor Value="#4391e6" />
+		<GridLabel Value="#3c3c3c7f" />
+		<GridLineBase Value="#1010103f" />
+		<ArrangerGridTiles Value="#0f0f0f11" />
+		<DetailGridTiles Value="#0f0f0f11" />
+		<GridGuideline Value="#121212" />
+		<OffGridGuideline Value="#1313134f" />
+		<TreeColumnHeadBackground Value="#bcbcbc" />
+		<TreeColumnHeadForeground Value="#3d3d3d" />
+		<TreeColumnHeadSelected Value="#cfcfcf" />
+		<TreeColumnHeadFocus Value="#bcbcbc" />
+		<TreeColumnHeadControl Value="#6e6e6e" />
+		<TreeRowCategoryForeground Value="#4f4f4f" />
+		<TreeRowCategoryBackground Value="#00000000" />
+		<BrowserTagBackground Value="#bcbcbc" />
+		<SearchIndication Value="#ffde72" />
+		<SearchIndicationStandby Value="#ccaa66" />
+		<KeyZoneBackground Value="#acf6b4" />
+		<KeyZoneCrossfadeRamp Value="#28bd56" />
+		<VelocityZoneBackground Value="#f5a7a3" />
+		<VelocityZoneCrossfadeRamp Value="#e95449" />
+		<SelectorZoneBackground Value="#bed6f4" />
+		<SelectorZoneCrossfadeRamp Value="#2d66d2" />
+		<ViewCheckControlEnabledOff Value="#242424" />
+		<ViewCheckControlDisabledOn Value="#dfdfdf" />
+		<ViewCheckControlDisabledOff Value="#6e6e6e" />
+		<DefaultBlendFactor Value="0.7440000176" />
+		<IconBlendFactor Value="0.7300000191" />
+		<ClipBlendFactor Value="0.7149999738" />
+		<NoteBorderStandbyBlendFactor Value="0.5360000134" />
+		<RetroDisplayBlendFactor Value="1" />
+		<CheckControlNotCheckedBlendFactor Value="0.5" />
+		<MixSurfaceAreaBlendFactor Value="0.375" />
+		<TextFrameSegmentBlendFactor Value="0.3210000098" />
+		<NoteDisabledSelectedBlendFactor Value="0.5" />
+		<BackgroundClip Value="#898989" />
+		<BackgroundClipFrame Value="#6e6e6e" />
+		<WarperTimeBarRulerBackground Value="#878787" />
+		<WarperTimeBarMarkerBackground Value="#929292" />
+		<MinVelocityNoteBlendFactor Value="0.2639999986" />
+		<StripedBackgroundShadeFactor Value="0.8180000186" />
+		<NonEditableAutomationAlpha Value="127" />
+		<DisabledContextMenuIconAlpha Value="85" />
+		<ClipBorderAlpha Value="112" />
+		<ScrollBarAlpha Value="255" />
+		<ScrollBarOnHoverAlpha Value="255" />
+		<ScrollBarBackgroundAlpha Value="255" />
+		<InaudibleTakeLightness Value="0.5" />
+		<InaudibleTakeSaturation Value="0.5" />
+		<InaudibleTakeNameLightness Value="0.75" />
+		<InaudibleTakeNameSaturation Value="0.75" />
+		<AutomationLaneClipBodyLightness Value="0.440000000000000002" />
+		<AutomationLaneClipBodySaturation Value="0.660000000000000031" />
+		<AutomationLaneHeaderLightness Value="0.440000000000000002" />
+		<AutomationLaneHeaderSaturation Value="0.660000000000000031" />
+		<TakeLaneHeaderLightness Value="0.5" />
+		<TakeLaneHeaderSaturation Value="0.5" />
+		<TakeLaneHeaderNameLightness Value="0.75" />
+		<TakeLaneHeaderNameSaturation Value="0.622999999999999998" />
+		<AutomationLaneHeaderNameLightness Value="0.75" />
+		<AutomationLaneHeaderNameSaturation Value="0.622999999999999998" />
+		<ClipContrastColorAdjustment Value="32" />
+		<SessionSlotOklabLCompensationFactor Value="50" />
+		<BipolarPotiTriangle Value="#242424" />
+		<Poti Value="#242424" />
+		<DeactivatedPoti Value="#6e6e6e" />
+		<PotiNeedle Value="#242424" />
+		<DeactivatedPotiNeedle Value="#6e6e6e" />
+		<PianoBlackKey Value="#5a5a5a" />
+		<PianoWhiteKey Value="#f1f1f1" />
+		<PianoKeySeparator Value="#a5a5a5" />
+		<TransportOffBackground Value="#a5a5a5" />
+		<TransportOffDisabledForeground Value="#6e6e6e" />
+		<TransportOffForeground Value="#121212" />
+		<TransportSelectionBackground Value="#cfcfcf" />
+		<Modulation Value="#008cad" />
+		<ModulationDisabled Value="#87a9b5" />
+		<ModulationMouseOver Value="#005f79" />
+		<AutomationTransformToolFrame Value="#242424bf" />
+		<AutomationTransformToolFrameActive Value="#242424" />
+		<AutomationTransformToolHandle Value="#242424bf" />
+		<AutomationTransformToolHandleActive Value="#242424" />
+		<MutedAuditionClip Value="#9c9c9c" />
+		<LinkedTrackHover Value="#b3d4e5" />
+		<ExpressionLaneHeaderHighlight Value="#bcbcbc" />
+		<DeactivatedClipHeader Value="#5b5b5bdf" />
+		<DeactivatedClipHeaderForeground Value="#bcbcbc" />
+		<ScaleAwareness Value="#be98ff" />
+		<StandardVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ff0a0a" />
+			<ZeroDecibel Value="#ff0a0a" />
+			<BelowZeroDecibel1 Value="#ffd100" />
+			<BelowZeroDecibel2 Value="#00f758" />
+			<Minimum Value="#00f758" />
+		</StandardVuMeter>
+		<OverloadVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffffff" />
+			<ZeroDecibel Value="#ffffff" />
+			<BelowZeroDecibel1 Value="#ffffff" />
+			<BelowZeroDecibel2 Value="#ffffff" />
+			<Minimum Value="#af0a0a" />
+		</OverloadVuMeter>
+		<DisabledVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffd00a" />
+			<ZeroDecibel Value="#828282" />
+			<BelowZeroDecibel1 Value="#7e7e7e" />
+			<BelowZeroDecibel2 Value="#7b7b7b" />
+			<Minimum Value="#6e6e6e" />
+		</DisabledVuMeter>
+		<HeadphonesVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#a5a5f1" />
+			<AboveZeroDecibel Value="#90aaec" />
+			<ZeroDecibel Value="#90aaec" />
+			<BelowZeroDecibel1 Value="#85b8f1" />
+			<BelowZeroDecibel2 Value="#7cc6f5" />
+			<Minimum Value="#0affff" />
+		</HeadphonesVuMeter>
+		<SendsOnlyVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#c8c800" />
+			<AboveZeroDecibel Value="#c8c800" />
+			<ZeroDecibel Value="#6464ff" />
+			<BelowZeroDecibel1 Value="#6464ff" />
+			<BelowZeroDecibel2 Value="#6464ff" />
+			<Minimum Value="#6464ff" />
+		</SendsOnlyVuMeter>
+		<BipolarGainReductionVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#5577c6" />
+			<AboveZeroDecibel Value="#5577c6" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</BipolarGainReductionVuMeter>
+		<OrangeVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ffa519" />
+			<AboveZeroDecibel Value="#ffa519" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</OrangeVuMeter>
+		<MainViewFocusIndicator Value="#3d3d3d" />
+		<MidiEditorBlackKeyBackground Value="#22222226" />
+		<MidiEditorBackgroundWhiteKeySeparator Value="#3d3d3d19" />
+		<RangeEditField3 Value="#f1ac00" />
+		<ScrollbarInnerHandleHover Value="#4f4f4f" />
+		<ScrollbarInnerTrackHover Value="#818181" />
+		<ScrollbarLCDHandleHover Value="#5b5b5b" />
+		<ScrollbarLCDTrackHover Value="#4f4f4f" />
+		<ScrollbarMixerShowOnScrollHandleHover Value="#0000007f" />
+		<RetroDisplayControlSelectionFrame Value="#cfcfcf" />
+		<ThresholdLineColorHover Value="#5b8cff" />
+		<SecondarySelectionForeground Value="#0000007f" />
+	</Theme>
+</Ableton></script>
+<script type="application/xml" id="default-theme"><?xml version="1.0" encoding="UTF-8"?>
+<Ableton MajorVersion="5" MinorVersion="12.0_12120" SchemaChangeCount="4" Creator="Ableton Live 12.1d1" Revision="">
+	<Theme>
+		<ControlForeground Value="#e0e0e0" />
+		<TextDisabled Value="#a7a7a7" />
+		<ControlDisabled Value="#a7a7a7" />
+		<MeterBackground Value="#1f1f1f" />
+		<SurfaceHighlight Value="#686868" />
+		<SurfaceArea Value="#2a2a2a" />
+		<Desktop Value="#393939" />
+		<ViewCheckControlEnabledOn Value="#ff9c39" />
+		<ScrollbarInnerHandle Value="#878787" />
+		<ScrollbarInnerTrack Value="#313131" />
+		<ScrollbarLCDHandle Value="#999999" />
+		<ScrollbarLCDTrack Value="#4f4f4f" />
+		<ScrollbarMixerShowOnScrollHandle Value="#00000066" />
+		<DetailViewBackground Value="#686868" />
+		<PreferencesTab Value="#4f4f4f" />
+		<SelectionFrame Value="#a7a7a7" />
+		<ControlBackground Value="#424242" />
+		<ControlFillHandle Value="#878787" />
+		<ChosenDefault Value="#ff9c39" />
+		<ChosenRecord Value="#ff5559" />
+		<ChosenPreListen Value="#3c6ab6" />
+		<ImplicitArm Value="#ff000064" />
+		<RangeDefault Value="#03c3d5" />
+		<RangeDisabled Value="#a7a7a7" />
+		<RangeDisabledOff Value="#909090" />
+		<LearnMidi Value="#4034ef" />
+		<LearnKey Value="#ff6400" />
+		<LearnMacro Value="#00da48" />
+		<RangeEditField Value="#007383" />
+		<RangeEditField2 Value="#a03c4c" />
+		<BipolReset Value="#03c3d5" />
+		<ChosenAlternative Value="#03c3d5" />
+		<ChosenAlert Value="#e76942" />
+		<ChosenPlay Value="#00d38d" />
+		<Clip1 Value="#8b7936" />
+		<Clip2 Value="#999565" />
+		<Clip3 Value="#b8ce93" />
+		<Clip4 Value="#afb95b" />
+		<Clip5 Value="#52ba46" />
+		<Clip6 Value="#81d24c" />
+		<Clip7 Value="#6baace" />
+		<Clip8 Value="#4881aa" />
+		<Clip9 Value="#954eb2" />
+		<Clip10 Value="#ff5f80" />
+		<Clip11 Value="#dc4848" />
+		<Clip12 Value="#d66b18" />
+		<Clip13 Value="#e0aa2a" />
+		<Clip14 Value="#ffec75" />
+		<Clip15 Value="#e7e6e6" />
+		<Clip16 Value="#a0a0a0" />
+		<ClipText Value="#000000" />
+		<ClipBorder Value="#393939" />
+		<SceneContrast Value="#393939" />
+		<SelectionBackground Value="#96d4e8" />
+		<StandbySelectionBackground Value="#547984" />
+		<SelectionForeground Value="#080808" />
+		<StandbySelectionForeground Value="#080808" />
+		<SelectionBackgroundContrast Value="#6a8f9b" />
+		<SurfaceBackground Value="#4f4f4f" />
+		<TakeLaneTrackHighlighted Value="#5b5b5b" />
+		<TakeLaneTrackNotHighlighted Value="#424242" />
+		<AutomationColor Value="#ff4d47" />
+		<AutomationGrid Value="#0e0e0e" />
+		<LoopColor Value="#080808" />
+		<OffGridLoopColor Value="#bbbbbb4f" />
+		<ArrangementRulerMarkings Value="#c6c6c6" />
+		<DetailViewRulerMarkings Value="#c6c6c6" />
+		<ShadowDark Value="#31313154" />
+		<ShadowLight Value="#3a3a3acc" />
+		<DisplayBackground Value="#1f1f1f" />
+		<AbletonColor Value="#00ff00" />
+		<WaveformColor Value="#0e0e0eef" />
+		<DimmedWaveformColor Value="#999999df" />
+		<VelocityColor Value="#e95449" />
+		<VelocitySelectedOrHovered Value="#5b8cff" />
+		<NoteProbability Value="#909090" />
+		<Alert Value="#e76942" />
+		<ControlOnForeground Value="#080808" />
+		<ControlOffForeground Value="#e0e0e0" />
+		<ControlOnDisabledForeground Value="#313131" />
+		<ControlOffDisabledForeground Value="#999999" />
+		<ControlOnAlternativeForeground Value="#080808" />
+		<ControlTextBack Value="#313131" />
+		<ControlContrastFrame Value="#151515" />
+		<ControlSelectionFrame Value="#c6c6c6" />
+		<ControlContrastTransport Value="#2a2a2a" />
+		<ViewControlOn Value="#ff9c39" />
+		<ViewControlOff Value="#2a2a2a" />
+		<Progress Value="#ff9c39" />
+		<ProgressText Value="#909090" />
+		<TransportProgress Value="#ff9c39" />
+		<ClipSlotButton Value="#2a2a2a" />
+		<BrowserBar Value="#4f4f4f" />
+		<BrowserBarOverlayHintTextColor Value="#878787" />
+		<BrowserDisabledItem Value="#a7a7a7" />
+		<BrowserSampleWaveform Value="#bcbcbc" />
+		<AutomationDisabled Value="#646464" />
+		<AutomationMouseOver Value="#ff9085" />
+		<MidiNoteMaxVelocity Value="#e95449" />
+		<RetroDisplayBackground Value="#1f1f1f" />
+		<RetroDisplayBackgroundLine Value="#5b5b5b" />
+		<RetroDisplayForeground Value="#ff9c39" />
+		<RetroDisplayForeground2 Value="#03c3d5" />
+		<RetroDisplayForegroundDisabled Value="#a7a7a7" />
+		<RetroDisplayGreen Value="#ff9c39" />
+		<RetroDisplayRed Value="#03c3d5" />
+		<RetroDisplayHandle1 Value="#ff9c39" />
+		<RetroDisplayHandle2 Value="#ff697f" />
+		<RetroDisplayScaleText Value="#bcbcbc" />
+		<RetroDisplayTitle Value="#e0e0e0" />
+		<ThresholdLineColor Value="#03c3d5" />
+		<GainReductionLineColor Value="#ff9c39" />
+		<InputCurveColor Value="#7a7a7a" />
+		<InputCurveOutlineColor Value="#00000000" />
+		<OutputCurveColor Value="#bcbcbc4c" />
+		<OutputCurveOutlineColor Value="#e5e5e5" />
+		<SpectrumDefaultColor Value="#7a7a7a" />
+		<SpectrumAlternativeColor Value="#3c6ab6" />
+		<SpectrumGridLines Value="#dfdfdf3f" />
+		<Operator1 Value="#e0d825" />
+		<Operator2 Value="#29d6cd" />
+		<Operator3 Value="#6571f6" />
+		<Operator4 Value="#f3751b" />
+		<DrumRackScroller1 Value="#686868" />
+		<DrumRackScroller2 Value="#999999" />
+		<FilledDrumRackPad Value="#e0e0e0" />
+		<SurfaceAreaFocus Value="#2a2a2a" />
+		<FreezeColor Value="#4391e6" />
+		<GridLabel Value="#e1e1e17f" />
+		<GridLineBase Value="#09090954" />
+		<ArrangerGridTiles Value="#0a0a0a19" />
+		<DetailGridTiles Value="#0a0a0a19" />
+		<GridGuideline Value="#e0e0e0" />
+		<OffGridGuideline Value="#dfdfdf4f" />
+		<TreeColumnHeadBackground Value="#686868" />
+		<TreeColumnHeadForeground Value="#e0e0e0" />
+		<TreeColumnHeadSelected Value="#686868" />
+		<TreeColumnHeadFocus Value="#686868" />
+		<TreeColumnHeadControl Value="#a7a7a7" />
+		<TreeRowCategoryForeground Value="#a7a7a7" />
+		<TreeRowCategoryBackground Value="#00000000" />
+		<BrowserTagBackground Value="#313131" />
+		<SearchIndication Value="#ecca6d" />
+		<SearchIndicationStandby Value="#ccaa66" />
+		<KeyZoneBackground Value="#acf6b4" />
+		<KeyZoneCrossfadeRamp Value="#28bd56" />
+		<VelocityZoneBackground Value="#f5a7a3" />
+		<VelocityZoneCrossfadeRamp Value="#e95449" />
+		<SelectorZoneBackground Value="#bed6f4" />
+		<SelectorZoneCrossfadeRamp Value="#2d66d2" />
+		<ViewCheckControlEnabledOff Value="#a7a7a7" />
+		<ViewCheckControlDisabledOn Value="#bcbcbc" />
+		<ViewCheckControlDisabledOff Value="#878787" />
+		<DefaultBlendFactor Value="0.7570000291" />
+		<IconBlendFactor Value="0.7300000191" />
+		<ClipBlendFactor Value="0.7580000162" />
+		<NoteBorderStandbyBlendFactor Value="0.5360000134" />
+		<RetroDisplayBlendFactor Value="1" />
+		<CheckControlNotCheckedBlendFactor Value="0.5" />
+		<MixSurfaceAreaBlendFactor Value="0.375" />
+		<TextFrameSegmentBlendFactor Value="0.3950000107" />
+		<NoteDisabledSelectedBlendFactor Value="0.5" />
+		<BackgroundClip Value="#878787" />
+		<BackgroundClipFrame Value="#4f4f4f" />
+		<WarperTimeBarRulerBackground Value="#4f4f4f" />
+		<WarperTimeBarMarkerBackground Value="#424242" />
+		<MinVelocityNoteBlendFactor Value="0.2639999986" />
+		<StripedBackgroundShadeFactor Value="0.8999999762" />
+		<NonEditableAutomationAlpha Value="127" />
+		<DisabledContextMenuIconAlpha Value="85" />
+		<ClipBorderAlpha Value="120" />
+		<ScrollBarAlpha Value="255" />
+		<ScrollBarOnHoverAlpha Value="255" />
+		<ScrollBarBackgroundAlpha Value="255" />
+		<InaudibleTakeLightness Value="0.322000000000000008" />
+		<InaudibleTakeSaturation Value="0.775000000000000022" />
+		<InaudibleTakeNameLightness Value="0.800000000000000044" />
+		<InaudibleTakeNameSaturation Value="0.853999999999999981" />
+		<AutomationLaneClipBodyLightness Value="0.260000000000000009" />
+		<AutomationLaneClipBodySaturation Value="0.80600000000000005" />
+		<AutomationLaneHeaderLightness Value="0.251000000000000001" />
+		<AutomationLaneHeaderSaturation Value="0.53400000000000003" />
+		<TakeLaneHeaderLightness Value="0.479999999999999982" />
+		<TakeLaneHeaderSaturation Value="0.900000000000000022" />
+		<TakeLaneHeaderNameLightness Value="0.849999999999999978" />
+		<TakeLaneHeaderNameSaturation Value="0.900000000000000022" />
+		<AutomationLaneHeaderNameLightness Value="0.708999999999999964" />
+		<AutomationLaneHeaderNameSaturation Value="0.900000000000000022" />
+		<ClipContrastColorAdjustment Value="24" />
+		<SessionSlotOklabLCompensationFactor Value="35" />
+		<BipolarPotiTriangle Value="#151515" />
+		<Poti Value="#151515" />
+		<DeactivatedPoti Value="#393939" />
+		<PotiNeedle Value="#1f1f1f" />
+		<DeactivatedPotiNeedle Value="#393939" />
+		<PianoBlackKey Value="#313131" />
+		<PianoWhiteKey Value="#e0e0e0" />
+		<PianoKeySeparator Value="#4f4f4f" />
+		<TransportOffBackground Value="#2a2a2a" />
+		<TransportOffDisabledForeground Value="#999999" />
+		<TransportOffForeground Value="#e0e0e0" />
+		<TransportSelectionBackground Value="#878787" />
+		<Modulation Value="#009aac" />
+		<ModulationDisabled Value="#79bdc7a9" />
+		<ModulationMouseOver Value="#8cffff" />
+		<AutomationTransformToolFrame Value="#393939bf" />
+		<AutomationTransformToolFrameActive Value="#0e0e0e" />
+		<AutomationTransformToolHandle Value="#393939bf" />
+		<AutomationTransformToolHandleActive Value="#0e0e0e" />
+		<MutedAuditionClip Value="#909090" />
+		<LinkedTrackHover Value="#b3d4e5" />
+		<ExpressionLaneHeaderHighlight Value="#5b5b5b" />
+		<DeactivatedClipHeader Value="#999999df" />
+		<DeactivatedClipHeaderForeground Value="#393939" />
+		<ScaleAwareness Value="#b595fc" />
+		<StandardVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ff0a0a" />
+			<ZeroDecibel Value="#ff0a0a" />
+			<BelowZeroDecibel1 Value="#ffd100" />
+			<BelowZeroDecibel2 Value="#00f758" />
+			<Minimum Value="#00f758" />
+		</StandardVuMeter>
+		<OverloadVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffffff" />
+			<ZeroDecibel Value="#ffffff" />
+			<BelowZeroDecibel1 Value="#ffffff" />
+			<BelowZeroDecibel2 Value="#ffffff" />
+			<Minimum Value="#af0a0a" />
+		</OverloadVuMeter>
+		<DisabledVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#ff0a0a" />
+			<AboveZeroDecibel Value="#ffd00a" />
+			<ZeroDecibel Value="#828282" />
+			<BelowZeroDecibel1 Value="#7e7e7e" />
+			<BelowZeroDecibel2 Value="#7b7b7b" />
+			<Minimum Value="#6e6e6e" />
+		</DisabledVuMeter>
+		<HeadphonesVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#a5a5f1" />
+			<AboveZeroDecibel Value="#90aaec" />
+			<ZeroDecibel Value="#90aaec" />
+			<BelowZeroDecibel1 Value="#85b8f1" />
+			<BelowZeroDecibel2 Value="#7cc6f5" />
+			<Minimum Value="#0affff" />
+		</HeadphonesVuMeter>
+		<SendsOnlyVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#c8c800" />
+			<AboveZeroDecibel Value="#c8c800" />
+			<ZeroDecibel Value="#6464ff" />
+			<BelowZeroDecibel1 Value="#6464ff" />
+			<BelowZeroDecibel2 Value="#6464ff" />
+			<Minimum Value="#6464ff" />
+		</SendsOnlyVuMeter>
+		<BipolarGainReductionVuMeter>
+			<OnlyMinimumToMaximum Value="false" />
+			<Maximum Value="#5577c6" />
+			<AboveZeroDecibel Value="#5577c6" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</BipolarGainReductionVuMeter>
+		<OrangeVuMeter>
+			<OnlyMinimumToMaximum Value="true" />
+			<Maximum Value="#ffa519" />
+			<AboveZeroDecibel Value="#ffa519" />
+			<ZeroDecibel Value="#ffa519" />
+			<BelowZeroDecibel1 Value="#ffa519" />
+			<BelowZeroDecibel2 Value="#ffa519" />
+			<Minimum Value="#ffa519" />
+		</OrangeVuMeter>
+		<MainViewFocusIndicator Value="#151515" />
+		<MidiEditorBlackKeyBackground Value="#0a0a0a19" />
+		<MidiEditorBackgroundWhiteKeySeparator Value="#14141419" />
+		<RangeEditField3 Value="#7a4f29" />
+		<ScrollbarInnerHandleHover Value="#a7a7a7" />
+		<ScrollbarInnerTrackHover Value="#313131" />
+		<ScrollbarLCDHandleHover Value="#a7a7a7" />
+		<ScrollbarLCDTrackHover Value="#686868" />
+		<ScrollbarMixerShowOnScrollHandleHover Value="#00000066" />
+		<RetroDisplayControlSelectionFrame Value="#878787" />
+		<ThresholdLineColorHover Value="#5b8cff" />
+		<SecondarySelectionForeground Value="#0000007f" />
+	</Theme>
+</Ableton></script>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const COLOR_RE = /^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/;
+
+/* colour helpers */
+function parseHex(h){ const m=COLOR_RE.exec((h||"").trim()); if(!m) return null;
+  const n=parseInt(m[1],16); return {r:(n>>16)&255,g:(n>>8)&255,b:n&255,a:m[2]?m[2].toLowerCase():""}; }
+function toHex(r,g,b,a){ const c=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0");
+  return "#"+c(r)+c(g)+c(b)+(a||""); }
+function rgbOf(hex){ const p=parseHex(hex); return p?toHex(p.r,p.g,p.b,""):"#000000"; }
+function rgb2hsl(r,g,b){ r/=255;g/=255;b/=255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let h=0,s=0,l=(mx+mn)/2;
+  const d=mx-mn; if(d){ s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+    if(mx===r) h=((g-b)/d+(g<b?6:0)); else if(mx===g) h=(b-r)/d+2; else h=(r-g)/d+4; h*=60; }
+  return {h,s,l}; }
+function hsl2rgb(h,s,l){ h=((h%360)+360)%360/360; let r,g,b;
+  if(!s){ r=g=b=l; } else { const q=l<0.5?l*(1+s):l+s-l*s, p=2*l-q;
+    const t=n=>{ n=(n+1)%1; if(n<1/6) return p+(q-p)*6*n; if(n<1/2) return q; if(n<2/3) return p+(q-p)*(2/3-n)*6; return p; };
+    r=t(h+1/3); g=t(h); b=t(h-1/3); }
+  return [r*255,g*255,b*255]; }
+const clamp01 = v => Math.max(0,Math.min(1,v));
+
+/* role groups */
+const SURFACE = ["Desktop","SurfaceArea","SurfaceBackground","SurfaceHighlight","SurfaceAreaFocus","MeterBackground",
+ "DisplayBackground","DetailViewBackground","PreferencesTab","ControlBackground","ControlContrastTransport",
+ "ControlContrastFrame","BrowserBar","BrowserTagBackground","ClipSlotButton","ClipBorder","SceneContrast",
+ "TreeColumnHeadBackground","TreeColumnHeadSelected","TreeColumnHeadFocus","TakeLaneTrackHighlighted",
+ "TakeLaneTrackNotHighlighted","WarperTimeBarRulerBackground","WarperTimeBarMarkerBackground","TransportOffBackground",
+ "TransportSelectionBackground","BackgroundClipFrame","RetroDisplayBackground","RetroDisplayBackgroundLine",
+ "ExpressionLaneHeaderHighlight","Poti","BipolarPotiTriangle","DeactivatedPoti","PotiNeedle","DeactivatedPotiNeedle",
+ "PianoBlackKey","PianoKeySeparator","ScrollbarLCDTrack","DrumRackScroller1","ControlTextBack"];
+const ROLES = [
+ {id:"highlight", label:"Highlight", keys:["ChosenDefault","ViewCheckControlEnabledOn","ViewControlOn","Progress",
+   "TransportProgress","RetroDisplayForeground","RetroDisplayGreen","RetroDisplayHandle1","GainReductionLineColor"]},
+ {id:"secondary", label:"Secondary", keys:["RangeDefault","BipolReset","ChosenAlternative","RetroDisplayForeground2",
+   "RetroDisplayRed","ThresholdLineColor"]},
+ {id:"selection", label:"Selection", keys:["SelectionBackground","StandbySelectionBackground","SelectionBackgroundContrast","TransportSelectionBackground"]},
+ {id:"play", label:"Play", keys:["ChosenPlay"]},
+ {id:"record", label:"Record", keys:["ChosenRecord"]},
+];
+
+/* advanced sections, ordered by edit frequency (noise last) */
+const SECTIONS = [
+ {id:"Surfaces", open:true, t:n=>/^(Surface|Desktop|MeterBackground|Display|DetailView|PreferencesTab|Shadow|BrowserBar$|BrowserTag|Warper|TakeLane)/.test(n)},
+ {id:"Text & controls", t:n=>/^(Control|Poti|Bipolar|BipolReset|Deactivated(Poti|PotiNeedle)|Transport(Off|Selection)|TextDisabled|Range|MainViewFocus)/.test(n)},
+ {id:"Accents", t:n=>/^(Chosen|ViewControl|ViewCheck|Progress|TransportProgress|Alert|ImplicitArm|Learn|Freeze|Automation(Color|MouseOver|Disabled)|Velocity(Color|Selected)|MidiNoteMaxVelocity|NoteProbability|ScaleAwareness|AbletonColor)/.test(n)},
+ {id:"Clips", t:n=>/^Clip\d|^Clip(Text|Border|SlotButton)$|^BackgroundClip|^SceneContrast$|^DeactivatedClipHeader/.test(n)},
+ {id:"Selection", t:n=>/Selection/.test(n)},
+ {id:"Browser & tree", t:n=>/^(Browser|Tree|SearchIndication)/.test(n)},
+ {id:"Grid & ruler", t:n=>/(Grid|Guideline|Ruler|Loop|Arranger|Marking)/.test(n)},
+ {id:"Piano & zones", t:n=>/(Piano|KeyZone|VelocityZone|SelectorZone|MidiEditor)/.test(n)},
+ {id:"Retro display", t:n=>/^RetroDisplay/.test(n)},
+ {id:"Scrollbars", t:n=>/^Scrollbar/.test(n)},
+ {id:"Modulation", t:n=>/(Modulation|Automation|LinkedTrack|TakeLane|Inaudible)/.test(n)},
+ {id:"Waveform & spectrum", t:n=>/(Waveform|Spectrum|Curve|ThresholdLine|GainReduction|Operator|DrumRack|FilledDrumRackPad)/.test(n)},
+ {id:"Values & alphas", t:()=>false},
+ {id:"Other", t:()=>true},
+];
+/* identical in every factory theme - pure noise. Hidden from the editor, preserved untouched on save. */
+const CONSTANTS = new Set(["AbletonColor","InputCurveOutlineColor","ScrollbarMixerShowOnScrollHandle","TreeRowCategoryBackground"]);
+// clip palette (Clip1-16, ClipText) is byte-identical across factory themes but genuinely editable - kept as Advanced overrides, not dropped
+/* text family - a second ladder driven off a single brightness control */
+const TEXT = ["ControlForeground","ControlOffForeground","TextDisabled","ControlDisabled","ControlOnDisabledForeground",
+ "GridGuideline","GridLabel","TransportOffForeground","TreeColumnHeadForeground","RetroDisplayTitle","ProgressText",
+ "BrowserBarOverlayHintTextColor","BrowserDisabledItem","DetailViewRulerMarkings","ArrangementRulerMarkings","RetroDisplayScaleText"];
+
+let doc=null;
+const model={}, baseline={};
+const pv=$("#pv");
+
+/* undo / redo - coalesces a burst of edits (e.g. a slider drag) into one step */
+let undoStack=[], redoStack=[], editOpen=false, editTimer=null;
+function snapshot(){ const s={}; for(const k in model) s[k]=model[k].el.getAttribute("Value"); return s; }
+function recordEdit(){
+  if(!editOpen){ undoStack.push(snapshot()); if(undoStack.length>120) undoStack.shift(); redoStack.length=0; editOpen=true; updateHistButtons(); }
+  clearTimeout(editTimer); editTimer=setTimeout(()=>{ editOpen=false; }, 350);
+}
+function applySnapshot(s){
+  for(const k in s){ const m=model[k]; if(m && m.el.getAttribute("Value")!==s[k]) m.el.setAttribute("Value", s[k]); }
+  applyAllVars();
+  document.querySelectorAll('#secs .row').forEach(row=>{ const m=model[row.dataset.name]; if(!m) return;
+    const v=m.el.getAttribute("Value");
+    const sw=row.querySelector('.sw'); if(sw) sw.value=rgbOf(v);
+    const hx=row.querySelector('.hex'); if(hx) hx.value=v;
+    const vv=row.querySelector('.val'); if(vv) vv.value=v; });
+  buildRoleSwatches();
+  const sb=model["SurfaceBackground"]; if(sb){ const p=parseHex(sb.el.getAttribute("Value"));
+    if(p){ const {h}=rgb2hsl(p.r,p.g,p.b); paintSurfSwatches(h); } }
+}
+function doUndo(){ if(!undoStack.length) return; editOpen=false; clearTimeout(editTimer);
+  redoStack.push(snapshot()); applySnapshot(undoStack.pop()); updateHistButtons(); }
+function doRedo(){ if(!redoStack.length) return; undoStack.push(snapshot()); applySnapshot(redoStack.pop()); updateHistButtons(); }
+function resetHistory(){ undoStack.length=0; redoStack.length=0; editOpen=false; clearTimeout(editTimer); updateHistButtons(); }
+function updateHistButtons(){ const u=$("#undoBtn"), r=$("#redoBtn"); if(u) u.disabled=!undoStack.length; if(r) r.disabled=!redoStack.length; }
+
+function loadThemeText(txt, fname){
+  doc = new DOMParser().parseFromString(txt, "application/xml");
+  if(doc.querySelector("parsererror")){ alert("That file isn't valid XML."); return; }
+  const lockSnap = snapshotLocks();     // capture locked sections before wiping the model
+  for(const k in model) delete model[k];
+  for(const k in baseline) delete baseline[k];
+  const theme = doc.querySelector("Theme") || doc.documentElement;
+  theme.querySelectorAll("*").forEach(el=>{
+    if(!el.hasAttribute("Value")) return;
+    const parent = el.parentElement;
+    const vuGroup = parent && parent !== theme ? parent.tagName : "";
+    const name = vuGroup ? vuGroup+"_"+el.tagName : el.tagName;
+    const val = el.getAttribute("Value");
+    model[name] = {el, isColor: COLOR_RE.test(val), vuGroup, tag: el.tagName};
+    baseline[name] = val;
+  });
+  if(fname) $("#fname").value = fname.replace(/\.ask$/i,"");
+  buildAdvanced(); buildRoleSwatches(); resetSimpleControls(); applyAllVars(); applySurface();
+  applyLocks(lockSnap);                 // re-impose any locked sections over the freshly loaded theme
+  resetHistory();
+}
+
+function setVar(name,val){ pv.style.setProperty("--t-"+name, val); }
+function applyAllVars(){
+  for(const name in model){ if(model[name].isColor) setVar(name, model[name].el.getAttribute("Value")); }
+  const col = k => { const e=(model["StandardVuMeter_"+k]||{}).el; return e?e.getAttribute("Value"):"#00f758"; };
+  pv.style.setProperty("--meter-grad",
+    "linear-gradient(to top, "+col("Minimum")+", "+col("BelowZeroDecibel2")+", "+col("BelowZeroDecibel1")+" 55%, "+col("ZeroDecibel")+" 80%, "+col("AboveZeroDecibel")+" 92%, "+col("Maximum")+")");
+}
+function setKey(name, val){
+  const m = model[name]; if(!m) return;
+  recordEdit();
+  m.el.setAttribute("Value", val);
+  if(m.isColor) setVar(name, val);
+  const sw=document.querySelector('.row[data-name="'+name+'"] .sw'); if(sw && m.isColor) sw.value=rgbOf(val);
+  const hx=document.querySelector('.row[data-name="'+name+'"] .hex'); if(hx) hx.value=val;
+  const vv=document.querySelector('.row[data-name="'+name+'"] .val'); if(vv) vv.value=val;
+}
+
+/* advanced */
+function buildAdvanced(){
+  const host=$("#secs"); host.innerHTML="";
+  const buckets={}; SECTIONS.forEach(s=>buckets[s.id]=[]);
+  for(const name in model){
+    const m=model[name];
+    if(m.vuGroup || CONSTANTS.has(name)) continue;   // noise: never edited, kept as-is on save
+    if(!m.isColor){ buckets["Values & alphas"].push(name); continue; }
+    buckets[SECTIONS.find(s=>s.t(name)).id].push(name);
+  }
+  SECTIONS.forEach(s=>{
+    const names=buckets[s.id]; if(!names.length) return;
+    const d=document.createElement("details"); d.className="sec"; if(s.open) d.open=true;
+    const sum=document.createElement("summary"); sum.innerHTML=s.id+'<span class="n">'+names.length+'</span>'; d.appendChild(sum);
+    const rows=document.createElement("div"); rows.className="rows";
+    names.forEach(name=>rows.appendChild(makeRow(name))); d.appendChild(rows); host.appendChild(d);
+  });
+}
+function highlightKey(name){
+  const row=document.querySelector('#secs .row[data-name="'+name+'"]');
+  if(!row) return;
+  const sec=row.closest('details.sec'); if(sec) sec.open=true;
+  row.scrollIntoView({block:"center",behavior:"smooth"});
+  row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
+}
+function makeRow(name){
+  const m=model[name], val=m.el.getAttribute("Value");
+  const row=document.createElement("div"); row.className="row"; row.dataset.name=name;
+  const disp = m.vuGroup ? m.vuGroup.replace(/VuMeter$/,"")+" › "+m.tag : name;
+  if(m.isColor){
+    const sw=document.createElement("input"); sw.type="color"; sw.className="sw"; sw.value=rgbOf(val);
+    const hx=document.createElement("input"); hx.type="text"; hx.className="hex"; hx.value=val; hx.spellcheck=false;
+    sw.addEventListener("input",()=>{ const a=parseHex(hx.value); setKey(name, sw.value + (a?a.a:"")); });
+    hx.addEventListener("change",()=>{ if(COLOR_RE.test(hx.value.trim())) setKey(name, hx.value.trim()); else hx.value=m.el.getAttribute("Value"); });
+    const nm=document.createElement("span"); nm.className="nm"; nm.textContent=disp; nm.title=name;
+    row.append(sw,hx,nm);
+  } else {
+    const vv=document.createElement("input"); vv.type="text"; vv.className="val"; vv.value=val; vv.spellcheck=false;
+    vv.addEventListener("change",()=>{ recordEdit(); m.el.setAttribute("Value", vv.value.trim()); });
+    const nm=document.createElement("span"); nm.className="nm"; nm.textContent=disp; nm.title=name;
+    row.append(vv,nm);
+  }
+  return row;
+}
+
+/* simple */
+function buildRoleSwatches(){
+  const host=$("#roleSwatches"); host.innerHTML="";
+  ROLES.forEach(role=>{
+    const present=role.keys.filter(k=>model[k]); if(!present.length) return;
+    const first=model[present[0]].el.getAttribute("Value");
+    const wrap=document.createElement("div"); wrap.className="swatchrow";
+    const lab=document.createElement("label"); lab.textContent=role.label;
+    const sw=document.createElement("input"); sw.type="color"; sw.className="bigsw"; sw.value=rgbOf(first);
+    const hx=document.createElement("input"); hx.type="text"; hx.className="hexin"; hx.value=rgbOf(first); hx.spellcheck=false;
+    const cnt=document.createElement("span"); cnt.className="count"; cnt.textContent=present.length+" key"+(present.length>1?"s":"");
+    const apply=hex=>{ const p=parseHex(hex); if(!p) return; present.forEach(k=>{ const cur=parseHex(model[k].el.getAttribute("Value")); setKey(k, toHex(p.r,p.g,p.b, cur?cur.a:"")); }); markPaletteEdit(role.id,p); };
+    sw.addEventListener("input",()=>{ hx.value=sw.value; apply(sw.value); });
+    hx.addEventListener("change",()=>{ if(COLOR_RE.test(hx.value.trim())){ sw.value=rgbOf(hx.value.trim()); apply(hx.value.trim()); } else hx.value=sw.value; });
+    wrap.append(lab,sw,hx,cnt); host.appendChild(wrap);
+  });
+}
+function applyBasic(){
+  // absolute base colour: hue + saturation set the surface family directly, over the loaded theme's lightness ladder
+  const hueAbs=((+$("#surfH").value%360)+360)%360, satAbs=clamp01(+$("#surfS").value/100),
+        lOff=+$("#surfL").value/100, contrast=+$("#surfC").value/100;
+  const bp=parseHex(baseline["SurfaceBackground"]); const baseL=bp?rgb2hsl(bp.r,bp.g,bp.b).l:0.5;
+  SURFACE.forEach(name=>{ if(!model[name]) return; const p=parseHex(baseline[name]); if(!p) return;
+    const ladder=rgb2hsl(p.r,p.g,p.b).l-baseL;              // keep each key's rung
+    const L=clamp01(baseL+lOff+ladder*(1+contrast));
+    const [r,g,b]=hsl2rgb(hueAbs,satAbs,L); setKey(name, toHex(r,g,b,p.a)); });
+  // text family: one brightness control shifts the whole text ladder
+  const tOff=+$("#textL").value/100;
+  TEXT.forEach(name=>{ if(!model[name]) return; const p=parseHex(baseline[name]); if(!p) return;
+    let {h,s,l}=rgb2hsl(p.r,p.g,p.b); l=clamp01(l+tOff);
+    const [r,g,b]=hsl2rgb(h,s,l); setKey(name, toHex(r,g,b,p.a)); });
+  syncBasicLabels();
+}
+const applySurface=applyBasic;
+// slider value labels + preview swatches, without recomputing theme colours
+function syncBasicLabels(){
+  const hueAbs=((+$("#surfH").value%360)+360)%360, satAbs=clamp01(+$("#surfS").value/100),
+        lOff=+$("#surfL").value/100, contrast=+$("#surfC").value/100, tOff=+$("#textL").value/100;
+  $("#surfHv").textContent=Math.round(hueAbs)+"°";
+  $("#surfSv").textContent=Math.round(satAbs*100);
+  $("#surfLv").textContent=(lOff>0?"+":"")+Math.round(lOff*100);
+  $("#surfCv").textContent=(contrast>0?"+":"")+Math.round(contrast*100);
+  $("#textLv").textContent=(tOff>0?"+":"")+Math.round(tOff*100);
+  paintSurfSwatches(hueAbs);
+}
+// section locks - keep a section's values while other theme values load
+const lockState={surfaces:false,text:false,accents:false};
+const LOCK_OPEN='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 7V4.7A3 3 0 0 1 10.7 3.4" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="3.3" y="7" width="9.4" height="6.6" rx="1.4" fill="currentColor"/></svg>';
+const LOCK_SHUT='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 7V4.7a3 3 0 0 1 6 0V7" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="3.3" y="7" width="9.4" height="6.6" rx="1.4" fill="currentColor"/></svg>';
+function snapshotLocks(){
+  const s={};
+  if(lockState.surfaces){ s.surfaces={}; SURFACE.forEach(k=>{ if(model[k]) s.surfaces[k]=model[k].el.getAttribute("Value"); });
+    s.surfSliders={H:$("#surfH").value,S:$("#surfS").value,L:$("#surfL").value,C:$("#surfC").value}; }
+  if(lockState.text){ s.text={}; TEXT.forEach(k=>{ if(model[k]) s.text[k]=model[k].el.getAttribute("Value"); }); s.textL=$("#textL").value; }
+  if(lockState.accents){ s.accents={}; ROLES.forEach(r=>r.keys.forEach(k=>{ if(model[k]) s.accents[k]=model[k].el.getAttribute("Value"); })); }
+  return s;
+}
+function applyLocks(s){
+  const put=obj=>{ for(const k in obj){ if(model[k]){ baseline[k]=obj[k]; setKey(k,obj[k]); } } };
+  if(s.surfaces){ $("#surfH").value=s.surfSliders.H; $("#surfS").value=s.surfSliders.S; $("#surfL").value=s.surfSliders.L; $("#surfC").value=s.surfSliders.C; put(s.surfaces); }
+  if(s.text){ $("#textL").value=s.textL; put(s.text); }
+  if(s.accents){ put(s.accents); buildRoleSwatches(); }
+  if(s.surfaces||s.text) syncBasicLabels();
+}
+function paintSurfSwatches(repHue){
+  // each swatch previews the result and chains off the sliders before it
+  const hue=((repHue%360)+360)%360;
+  const satPos=clamp01(+$("#surfS").value/100);     // 0..1 absolute saturation
+  const lPos=(+$("#surfL").value+40)/80;            // 0..1 brightness level
+  const cPos=(+$("#surfC").value+60)/120;           // 0..1 contrast amount
+  const grey=v=>{ const n=Math.round(clamp01(v)*255); return "rgb("+n+","+n+","+n+")"; };
+  // Hue - selected hue, always fully saturated
+  const sH=$("#surfHueSw"); if(sH) sH.style.background="hsl("+hue+",100%,50%)";
+  // Saturation - the hue at the selected saturation (grey -> full hue)
+  const sS=$("#surfSSw"); if(sS) sS.style.background="hsl("+hue+","+Math.round(satPos*100)+"%,50%)";
+  // Brightness - a single grey at the slider position (black -> white)
+  const sL=$("#surfLSw"); if(sL) sL.style.background=grey(lPos);
+  // Contrast - flat grey at the brightness level when low; widens to a hard dark/light split when high
+  const sC=$("#surfCSw"); if(sC){ const spread=cPos*0.5, soft=Math.round((1-cPos)*22);
+    sC.style.background="linear-gradient(90deg,"+grey(lPos-spread)+" "+(50-soft)+"%,"+grey(lPos+spread)+" "+(50+soft)+"%)"; }
+  // Saturation track - grey -> full hue at the current hue
+  const slS=$("#surfS"); if(slS) slS.style.background="linear-gradient(90deg,#808080,hsl("+hue+",100%,50%))";
+}
+function resetSimpleControls(){
+  // Hue/Saturation default to the loaded theme's own surface base; Brightness/Contrast/Text are offsets at 0
+  const bp=parseHex(baseline["SurfaceBackground"]); const hs=bp?rgb2hsl(bp.r,bp.g,bp.b):{h:0,s:0};
+  const set=(id,v)=>{ const el=$("#"+id); if(el) el.value=v; };
+  set("surfH",Math.round(hs.h)); set("surfS",Math.round(hs.s*100)); set("surfL",0); set("surfC",0); set("textL",0);
+}
+
+/* ---- from-image palette generator ---- */
+const IMG_K = 5;                 // sample dots / palette slots
+let imgData=null, imgW=0, imgH=0, imgSlots=[];   // slots: {x,y,r,g,b} normalised x/y
+function sampleAt(nx,ny){
+  const x=Math.max(0,Math.min(imgW-1,Math.round(nx*imgW))), y=Math.max(0,Math.min(imgH-1,Math.round(ny*imgH)));
+  const i=(y*imgW+x)*4; return {r:imgData.data[i],g:imgData.data[i+1],b:imgData.data[i+2]};
+}
+function medianCut(pix,k){            // pix: flat array of {r,g,b}; returns k averaged boxes
+  let boxes=[pix];
+  const range=b=>{ let mn=[255,255,255],mx=[0,0,0];
+    for(const p of b){ const c=[p.r,p.g,p.b]; for(let j=0;j<3;j++){ if(c[j]<mn[j])mn[j]=c[j]; if(c[j]>mx[j])mx[j]=c[j]; } }
+    const d=[mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2]]; return {span:Math.max(...d)*Math.cbrt(b.length),ch:d.indexOf(Math.max(...d))}; };
+  while(boxes.length<k){
+    let bi=-1,best=-1; boxes.forEach((b,i)=>{ if(b.length<2) return; const r=range(b).span; if(r>best){best=r;bi=i;} });
+    if(bi<0) break;
+    const box=boxes[bi], ch=["r","g","b"][range(box).ch];
+    box.sort((p,q)=>p[ch]-q[ch]); const m=box.length>>1;
+    boxes.splice(bi,1,box.slice(0,m),box.slice(m));
+  }
+  return boxes.map(b=>{ let r=0,g=0,bl=0; for(const p of b){r+=p.r;g+=p.g;bl+=p.b;}
+    return {r:Math.round(r/b.length),g:Math.round(g/b.length),b:Math.round(bl/b.length),pop:b.length}; });
+}
+function hueDist(a,b){ let d=Math.abs(a-b)%360; return d>180?360-d:d; }
+// is a colour present in the loaded image (within per-channel tolerance)?
+function colourInImage(r,g,b,per){ if(!imgData) return false; const tol=per*per*3,d=imgData.data;
+  for(let i=0;i<d.length;i+=4){ if(d[i+3]<128) continue; if((d[i]-r)**2+(d[i+1]-g)**2+(d[i+2]-b)**2<=tol) return true; } return false; }
+// a role edited elsewhere feeds back to its palette slot; off-palette (hand-picked) slots show an X
+const ROLE_SLOT={highlight:1,secondary:2,selection:3,play:4};
+function markPaletteEdit(roleId,p){ const i=ROLE_SLOT[roleId]; if(i==null||!imgSlots.length) return;
+  imgSlots[i].r=p.r; imgSlots[i].g=p.g; imgSlots[i].b=p.b; imgSlots[i].off=!colourInImage(p.r,p.g,p.b,30);
+  renderStrip(); renderDots(); }
+// Surface swatch follows the applied surface colour; an edit away from the photo shows an X (the pick for re-apply is kept separate)
+function syncSurfaceSlot(){
+  if(!imgSlots.length || !imgData || !model["SurfaceBackground"]) return;
+  const p=parseHex(model["SurfaceBackground"].el.getAttribute("Value")); if(!p) return;
+  imgSlots[0].r=p.r; imgSlots[0].g=p.g; imgSlots[0].b=p.b; imgSlots[0].off=!colourInImage(p.r,p.g,p.b,30);
+  renderStrip(); renderDots();
+}
+// update one dot in place (safe during a drag, unlike a full renderDots)
+function updateDot(i){ const d=document.querySelector('#imgpanel .dot[data-i="'+i+'"]'); if(!d) return;
+  const s=imgSlots[i], dc=s.pick||s; d.style.background="rgb("+dc.r+","+dc.g+","+dc.b+")"; d.textContent=s.off?"✕":(i+1); d.classList.toggle("off",!!s.off); }
+// fixed slot order - each slot always drives the same UI role, so moving a dot only ever changes its own target
+const SLOT_ROLES=[
+ {k:"surface",   lab:"Surface"},
+ {k:"highlight", lab:"Highlight"},
+ {k:"secondary", lab:"Secondary"},
+ {k:"selection", lab:"Selection"},
+ {k:"functional",lab:"Play/Rec"},
+];
+function repPixel(c){                   // nearest image pixel to colour c -> normalised {x,y}
+  let bx=0,by=0,bd=1e9;
+  for(let y=0;y<imgH;y+=2) for(let x=0;x<imgW;x+=2){ const i=(y*imgW+x)*4;
+    const d=(imgData.data[i]-c.r)**2+(imgData.data[i+1]-c.g)**2+(imgData.data[i+2]-c.b)**2;
+    if(d<bd){bd=d;bx=x;by=y;} }
+  return {x:bx/imgW,y:by/imgH};
+}
+// salient accent candidates: a small vivid feature "punches above its pixel count", especially when it
+// contrasts the dominant tone. Bin by hue, weight by saturation (squared) and mid-tone-ness, gate out
+// specks, then boost hues that sit far from the mood colour so a blue boat in an orange photo survives.
+function salientColours(){
+  const BINS=36, d=imgData.data;
+  const sal=new Array(BINS).fill(0), cnt=new Array(BINS).fill(0),
+        sr=new Array(BINS).fill(0), sg=new Array(BINS).fill(0), sb=new Array(BINS).fill(0);
+  let total=0;
+  for(let i=0;i<d.length;i+=4){ if(d[i+3]<128) continue; total++;
+    const r=d[i],g=d[i+1],b=d[i+2]; const {h,s,l}=rgb2hsl(r,g,b);
+    if(s<0.18) continue;                              // neutral: not an accent candidate
+    const w=s*s*(1-Math.abs(l-0.5)*0.7);             // vivid mid-tones weigh most
+    if(w<=0) continue;
+    const bi=Math.min(BINS-1,Math.floor(h/360*BINS));
+    sal[bi]+=w; cnt[bi]++; sr[bi]+=r*w; sg[bi]+=g*w; sb[bi]+=b*w;
+  }
+  let dbi=0,dc=-1; cnt.forEach((c,i)=>{ if(c>dc){dc=c;dbi=i;} });   // dominant saturated hue = the "mood"
+  const domHue=(dbi+0.5)/BINS*360;
+  const floor=Math.max(4,total*0.003);               // real feature, not a stray speck (~0.3%)
+  const cands=[];
+  for(let i=0;i<BINS;i++){ if(cnt[i]<floor||sal[i]<=0) continue;
+    const r=Math.round(sr[i]/sal[i]),g=Math.round(sg[i]/sal[i]),b=Math.round(sb[i]/sal[i]);
+    const o=rgb2hsl(r,g,b);
+    const score=sal[i]*(1+hueDist(o.h,domHue)/180*1.6);  // contrast with the mood boosts salience
+    cands.push({r,g,b,h:o.h,s:o.s,l:o.l,score});
+  }
+  return cands.sort((a,b)=>b.score-a.score);
+}
+function assignSlots(pix){              // Surface = prevalence; accents = salience + max hue-spread
+  const pal=medianCut(pix,6).map(c=>{ const o=rgb2hsl(c.r,c.g,c.b); return {r:c.r,g:c.g,b:c.b,pop:c.pop,h:o.h,s:o.s,l:o.l}; });
+  const surface=pal.reduce((a,b)=>b.pop>a.pop?b:a);               // most prevalent = backdrop
+  let acc=salientColours();
+  if(!acc.length) acc=pal.filter(c=>c.s>=0.12).sort((a,b)=>b.s-a.s);  // muted image: fall back to palette
+  if(!acc.length) acc=[surface];
+  // greedy max-spread: first by salience, then farthest hue from everything already chosen
+  const picked=[acc[0]];
+  while(picked.length<4 && picked.length<acc.length){
+    let best=null,bv=-1;
+    for(const c of acc){ if(picked.includes(c)) continue;
+      const dmin=Math.min(...picked.map(q=>hueDist(c.h,q.h)));
+      const v=dmin*Math.sqrt(c.score||c.s||0.1); if(v>bv){bv=v;best=c;} }
+    if(!best) break; picked.push(best);
+  }
+  const hi=picked[0], rest=picked.slice(1);
+  const sel=rest.find(c=>c.h>=175&&c.h<=265) || rest[0] || hi;    // selection prefers cool
+  const sec=rest.find(c=>c!==sel) || rest[0] || hi;
+  const fnl=[...picked].sort((a,b)=>b.s-a.s)[0] || hi;            // vividness source
+  return [surface,hi,sec,sel,fnl].map((c,i)=>{ const p=repPixel(c); const o={x:p.x,y:p.y,r:c.r,g:c.g,b:c.b,off:false}; if(i===0) o.pick={r:c.r,g:c.g,b:c.b}; return o; });
+}
+function loadImage(src){
+  const im=new Image();
+  im.onload=()=>{
+    const maxd=160, sc=Math.min(1,maxd/Math.max(im.width,im.height));
+    imgW=Math.max(1,Math.round(im.width*sc)); imgH=Math.max(1,Math.round(im.height*sc));
+    const off=document.createElement("canvas"); off.width=imgW; off.height=imgH;
+    const octx=off.getContext("2d"); octx.drawImage(im,0,0,imgW,imgH);
+    imgData=octx.getImageData(0,0,imgW,imgH);
+    const pix=[]; for(let i=0;i<imgData.data.length;i+=4){ if(imgData.data[i+3]<128) continue;
+      pix.push({r:imgData.data[i],g:imgData.data[i+1],b:imgData.data[i+2]}); }
+    imgSlots=assignSlots(pix);
+    const cv=$("#imgcanvas"); cv.width=imgW; cv.height=imgH;
+    cv.getContext("2d").putImageData(imgData,0,0);
+    $("#imgstage").classList.add("has"); $("#imggen").disabled=false;
+    renderDots(); renderStrip(); generateFromImage();   // auto-apply on load
+  };
+  im.src=src;
+}
+function renderDots(){
+  const stage=$("#imgstage");
+  stage.querySelectorAll(".dot").forEach(d=>d.remove());
+  imgSlots.forEach((s,i)=>{
+    const d=document.createElement("div"); d.className="dot"+(s.off?" off":""); d.dataset.i=i;
+    d.style.left=(s.x*100)+"%"; d.style.top=(s.y*100)+"%";
+    const dc=s.pick||s;                                  // dot shows the sampled pixel colour
+    d.style.background="rgb("+dc.r+","+dc.g+","+dc.b+")";
+    d.textContent=s.off?"✕":(i+1); d.title=SLOT_ROLES[i].lab+(s.off?" (edited - not in image)":"");
+    stage.appendChild(d);
+  });
+}
+function renderStrip(){
+  const strip=$("#imgstrip"); strip.innerHTML="";
+  imgSlots.forEach((s,i)=>{ const hex=toHex(s.r,s.g,s.b,"");
+    strip.insertAdjacentHTML("beforeend",
+      '<div class="sw"><span class="col" style="background:'+hex+'" title="'+SLOT_ROLES[i].lab+' '+hex+(s.off?' (edited - not in image)':'')+'"><b>'+(i+1)+'</b>'+(s.off?'<span class="x">&#10005;</span>':'')+'</span><label>'+SLOT_ROLES[i].lab+'</label></div>'); });
+}
+let dragDot=null, genRAF=0;
+function liveGen(){ if(genRAF) return; genRAF=requestAnimationFrame(()=>{ genRAF=0; generateFromImage(); }); }
+function dotMove(e){
+  if(!dragDot) return;
+  const r=$("#imgcanvas").getBoundingClientRect();
+  const nx=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)), ny=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+  const i=+dragDot.dataset.i, c=sampleAt(nx,ny);
+  imgSlots[i]={x:nx,y:ny,r:c.r,g:c.g,b:c.b,off:false};
+  if(i===0) imgSlots[i].pick={r:c.r,g:c.g,b:c.b};        // surface: this pixel is the new pick
+  dragDot.style.left=(nx*100)+"%"; dragDot.style.top=(ny*100)+"%"; dragDot.style.background="rgb("+c.r+","+c.g+","+c.b+")";
+  dragDot.textContent=i+1; dragDot.classList.remove("off");
+  renderStrip(); liveGen();            // live preview update
+}
+function generateFromImage(){
+  if(imgSlots.length<IMG_K) return;
+  const hsl=s=>{ const o=rgb2hsl(s.r,s.g,s.b); return {h:o.h,s:o.s,l:o.l}; };
+  const surf=hsl(imgSlots[0].pick||imgSlots[0]), hi=imgSlots[1], sec=imgSlots[2], sel=imgSlots[3], fn=hsl(imgSlots[4]);
+  const surfSat = Math.min(0.42, surf.s*0.5);   // tinted greys; a near-grey surface slot -> near-neutral theme
+  // 1) surfaces: drive the Basic sliders to the image's base hue/sat (brightness/contrast neutral)
+  $("#surfH").value=Math.round(surf.h); $("#surfS").value=Math.round(surfSat*100);
+  $("#surfL").value=0; $("#surfC").value=0;
+  applyBasic();
+  // reflect the applied surface in slot 0's swatch (pick kept separate for re-apply)
+  const sbNow=parseHex(model["SurfaceBackground"].el.getAttribute("Value"));
+  if(sbNow){ imgSlots[0].r=sbNow.r; imgSlots[0].g=sbNow.g; imgSlots[0].b=sbNow.b; imgSlots[0].off=false; }
+  // 2) accents - fixed slots
+  const setRole=(id,c)=>{ const role=ROLES.find(r=>r.id===id); if(!role) return;
+    role.keys.filter(k=>model[k]).forEach(k=>{ const cur=parseHex(model[k].el.getAttribute("Value")); setKey(k, toHex(c.r,c.g,c.b, cur?cur.a:"")); }); };
+  setRole("highlight",hi); setRole("secondary",sec); setRole("selection",sel);
+  // 3) functional: lock hue to function, borrow slot vividness, keep baseline lightness (perceptive place)
+  const funcRole=(id,hue)=>{ const role=ROLES.find(r=>r.id===id); if(!role) return;
+    role.keys.filter(k=>model[k]).forEach(k=>{ const p=parseHex(baseline[k]); if(!p) return;
+      const {l}=rgb2hsl(p.r,p.g,p.b); const [r,g,b]=hsl2rgb(hue,fn.s,l); const cur=parseHex(model[k].el.getAttribute("Value")); setKey(k, toHex(r,g,b, cur?cur.a:"")); }); };
+  funcRole("play",130); funcRole("record",0);
+  buildRoleSwatches();
+  renderStrip(); updateDot(0);          // reflect applied surface (in-place dot update is drag-safe)
+}
+
+/* save */
+function serialise(){ let xml=new XMLSerializer().serializeToString(doc);
+  xml=xml.replace(/^<\?xml[^>]*\?>\s*/,"");
+  xml=xml.replace(/\s*\/>/g," />");   // Ableton writes " />" (space); match it exactly, cross-browser
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'+xml+'\n'; }
+function save(){
+  const name=($("#fname").value.trim()||"Theme").replace(/\.ask$/i,"")+".ask";
+  const blob=new Blob([serialise()],{type:"application/xml"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* folder browser */
+let themes=[], tIdx=-1, dirHandle=null;
+function renderThemeList(){
+  const host=$("#themeList"); host.innerHTML="";
+  themes.forEach((t,i)=>{ const b=document.createElement("button"); b.className="chip";
+    b.textContent=t.name.replace(/\.ask$/i,""); b.addEventListener("click",()=>selectTheme(i)); host.appendChild(b); });
+  updateNav();
+}
+async function fileOf(t){ return t.file || await t.handle.getFile(); }
+async function selectTheme(i){ if(i<0||i>=themes.length) return; tIdx=i;
+  const t=themes[i], text=await (await fileOf(t)).text(); loadThemeText(text, t.name);
+  [...$("#themeList").children].forEach((c,j)=>c.classList.toggle("on",j===i));
+  const el=$("#themeList").children[i]; if(el) el.scrollIntoView({inline:"center",block:"nearest"});
+  updateNav();
+}
+function updateNav(){ $("#prevTheme").disabled=tIdx<=0; $("#nextTheme").disabled=tIdx<0||tIdx>=themes.length-1;
+  $("#themePos").textContent = themes.length ? ((tIdx>=0?tIdx+1:"–")+" / "+themes.length) : "—"; }
+function loadThemes(list){ themes=list.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+  tIdx=-1; renderThemeList(); if(themes.length) selectTheme(0); }
+async function openFolder(){
+  if(window.showDirectoryPicker){
+    let h; try{ h=await window.showDirectoryPicker(); }catch(err){ return; }
+    dirHandle=h; const list=[];
+    for await (const [name,entry] of dirHandle.entries()){ if(entry.kind==="file" && /\.ask$/i.test(name)) list.push({name, handle:entry}); }
+    loadThemes(list);
+  } else { $("#loadfolder").click(); }
+}
+$("#browseFolder").addEventListener("click",openFolder);
+$("#loadfolder").addEventListener("change",e=>{ dirHandle=null;
+  loadThemes([...e.target.files].filter(f=>/\.ask$/i.test(f.name)).map(file=>({name:file.name,file}))); e.target.value=""; });
+$("#prevTheme").addEventListener("click",()=>selectTheme(tIdx-1));
+$("#nextTheme").addEventListener("click",()=>selectTheme(tIdx+1));
+$("#undoBtn").addEventListener("click",doUndo);
+$("#redoBtn").addEventListener("click",doRedo);
+document.addEventListener("keydown",e=>{
+  const mod=e.metaKey||e.ctrlKey;
+  if(mod && (e.key==="z"||e.key==="Z")){ e.preventDefault(); if(e.shiftKey) doRedo(); else doUndo(); return; }
+  if(mod && (e.key==="y"||e.key==="Y")){ e.preventDefault(); doRedo(); return; }
+  if(e.target.matches("input,textarea,select")) return;
+  if(e.key==="ArrowLeft") selectTheme(tIdx-1); else if(e.key==="ArrowRight") selectTheme(tIdx+1); });
+
+/* wiring */
+$("#loadfile").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>loadThemeText(r.result, f.name); r.readAsText(f); e.target.value=""; });
+$("#save").addEventListener("click",save);
+["surfH","surfS","surfL","surfC"].forEach(id=>$("#"+id).addEventListener("input",()=>{ applyBasic(); syncSurfaceSlot(); }));
+$("#textL").addEventListener("input",applyBasic);
+document.querySelectorAll("[data-reset]").forEach(btn=>btn.addEventListener("click",()=>{
+  const t=btn.dataset.reset;
+  if(t==="dark") loadThemeText($("#theme-dark").textContent.trim(),"Default Dark");
+  else if(t==="light") loadThemeText($("#theme-light").textContent.trim(),"Default Light");
+  else { resetSimpleControls(); applyBasic(); }   // "loaded" - back to the loaded theme's base
+}));
+// Accents reset - Default dark/light share the same accents, so one "Default" covers both
+function accentValuesFrom(src){ const m={};
+  if(src==="baseline"){ ROLES.forEach(r=>r.keys.forEach(k=>{ if(baseline[k]!=null) m[k]=baseline[k]; })); }
+  else { const d=new DOMParser().parseFromString($("#theme-dark").textContent.trim(),"application/xml");
+    ROLES.forEach(r=>r.keys.forEach(k=>{ const el=d.getElementsByTagName(k)[0]; if(el&&el.hasAttribute("Value")) m[k]=el.getAttribute("Value"); })); }
+  return m; }
+function applyAccents(map){ for(const k in map){ if(model[k]) setKey(k,map[k]); } buildRoleSwatches();
+  if(imgSlots.length){ ["highlight","secondary","selection","play"].forEach(id=>{ const role=ROLES.find(r=>r.id===id);
+    const k=role.keys.find(k=>model[k]); if(k) markPaletteEdit(id,parseHex(model[k].el.getAttribute("Value"))); }); } }
+document.querySelectorAll("[data-areset]").forEach(btn=>btn.addEventListener("click",()=>{
+  applyAccents(accentValuesFrom(btn.dataset.areset==="default" ? "theme" : "baseline"));
+}));
+document.querySelectorAll(".lock").forEach(btn=>{ btn.innerHTML=LOCK_OPEN;
+  btn.addEventListener("click",()=>{ const sec=btn.dataset.lock; lockState[sec]=!lockState[sec];
+    btn.classList.toggle("on",lockState[sec]); btn.innerHTML=lockState[sec]?LOCK_SHUT:LOCK_OPEN; }); });
+/* from-image wiring */
+$("#imgdrop").addEventListener("click",()=>$("#imgfile").click());
+$("#imgfile").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>loadImage(r.result); r.readAsDataURL(f); e.target.value=""; });
+const dz=$("#imgdrop");
+["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.add("over"); }));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{ e.preventDefault(); dz.classList.remove("over"); }));
+dz.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith("image/")){ const r=new FileReader(); r.onload=()=>loadImage(r.result); r.readAsDataURL(f); } });
+$("#imgstage").addEventListener("pointerdown",e=>{ if(!e.target.classList.contains("dot")) return;
+  dragDot=e.target; dragDot.setPointerCapture(e.pointerId); e.preventDefault(); });
+window.addEventListener("pointermove",dotMove);
+window.addEventListener("pointerup",()=>{ dragDot=null; });
+$("#imggen").addEventListener("click",generateFromImage);
+$("#search").addEventListener("input",e=>{ const q=e.target.value.toLowerCase();
+  document.querySelectorAll("#secs .sec").forEach(sec=>{ let any=false;
+    sec.querySelectorAll(".row").forEach(r=>{ const hit=r.dataset.name.toLowerCase().includes(q); r.hidden=!hit; if(hit) any=true; });
+    sec.hidden=!any; if(q&&any) sec.open=true; });
+});
+
+/* boot */
+loadThemeText($("#default-theme").textContent.trim(), null);
+(function buildPreview(){
+  const STOCK_CLIP=["#8b7936","#999565","#b8ce93","#afb95b","#52ba46","#81d24c","#6baace","#4881aa","#954eb2","#ff5f80","#dc4848","#d66b18","#e0aa2a","#ffec75","#e7e6e6","#a0a0a0"];
+  const clipVar=i=>"var(--t-Clip"+i+","+STOCK_CLIP[i-1]+")";
+  const tracks=["1 MIDI","2 MIDI","3 Audio","4 Audio","5 Audio"];
+  const clipAt={ "0-0":{c:1,t:"Intro",sel:1}, "0-2":{c:5,t:"Verse"}, "0-5":{c:13,t:"Break"},
+    "1-1":{c:7,t:"Pad"}, "1-4":{c:9,t:"Keys"},
+    "2-0":{c:12,t:"Loop"}, "2-3":{c:3,t:"Perc"}, "2-6":{c:11,t:"Fill"},
+    "3-2":{c:8,t:"Bass"}, "3-5":{c:4,t:"Sub"},
+    "4-1":{c:6,t:"FX"}, "4-4":{c:16,t:"Noise"} };
+  const rows=9;
+  const cell=(inner,cls)=>'<div class="cell '+(cls||"")+'">'+inner+'</div>';
+  const emptyCb='<div class="cb" data-key="ClipSlotButton"><span class="tri">▶</span></div>';
+  let grid="";
+  tracks.forEach((n,ti)=>{ let col='<div class="col" data-key="SurfaceArea"><div class="th" data-key="SurfaceHighlight">'+n+'</div>';
+    for(let r=0;r<rows;r++){ const c=clipAt[ti+"-"+r];
+      col += c ? cell('<div class="cb clip" data-key="Clip'+c.c+'" style="background:'+clipVar(c.c)+'"><span class="tri">▶</span>'+c.t+'</div>', c.sel?"sel":"")
+               : cell(emptyCb);
+    } grid+=col+"</div>"; });
+  ["A Reverb","B Delay"].forEach(n=>{ let col='<div class="col ret" data-key="SurfaceArea"><div class="th ret" data-key="SurfaceHighlight">'+n+'</div>';
+    for(let r=0;r<rows;r++) col+=cell("","ret"); grid+=col+"</div>"; });
+  let master='<div class="col master" data-key="SurfaceArea"><div class="th" data-key="SurfaceHighlight">Master</div>';
+  for(let r=0;r<rows;r++) master+=cell('<div class="cb" data-key="ClipSlotButton">'+(r+1)+'</div>',"scene");
+  master+="</div>";
+  const strip=o=>{ let act='<div class="act">';
+    if(o.master) act+='<b>M</b>'; else if(o.ret) act+='<s>S</s>';
+    else act+='<b data-key="ChosenDefault">'+o.num+'</b><s>S</s><s class="'+(o.armed?"armed":"")+'" data-key="ChosenRecord">●</s>';
+    act+='</div>';
+    return '<div class="mcol '+(o.ret?"ret":"")+(o.master?" master":"")+'" data-key="SurfaceArea">'+act
+      +'<div class="knob" data-key="ControlBackground"></div>'
+      +'<div class="fadrow"><div class="fader" data-key="ControlBackground"><i style="bottom:'+(o.f||35)+'%"></i></div><div class="meter"></div></div></div>'; };
+  let mix="";
+  tracks.forEach((n,ti)=> mix+=strip({num:ti+1, armed:ti===0, f:26+ti*6}));
+  mix+=strip({ret:1,f:40})+strip({ret:1,f:38})+strip({master:1,f:44});
+
+  /* ---- MIDI note editor (piano roll) ---- */
+  const nRows=15, startMidi=55, cols=16;      // 15 semitones from G3, 4 bars x 4
+  const rowH=100/nRows, black=[1,3,6,8,10], scale=[0,2,4,5,7,9,11];
+  const names=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  let keysHtml="", rowsHtml="";
+  for(let i=0;i<nRows;i++){ const pitch=startMidi+(nRows-1-i), pc=pitch%12, isB=black.includes(pc);
+    const lbl = pc===0 ? "C"+(Math.floor(pitch/12)-1) : "";
+    keysHtml+='<div class="key '+(isB?"black":"white")+'" data-key="'+(isB?"PianoBlackKey":"PianoWhiteKey")+'">'+lbl+'</div>';
+    rowsHtml+='<div class="nrow '+(isB?"black":"")+(pc===0?" scale":"")+'" style="top:'+(i*rowH)+'%;height:'+rowH+'%"></div>'; }
+  let glines="";
+  for(let c=1;c<cols;c++) glines+='<div class="gline '+(c%4===0?"bar":"")+'" data-key="'+(c%4===0?"GridGuideline":"GridLineBase")+'" style="left:'+(c/cols*100)+'%"></div>';
+  const notes=[ {r:10,c:0,l:2,v:.82,sel:1},{r:8,c:2,l:2,v:.6},{r:7,c:4,l:1,v:.48},{r:5,c:5,l:3,v:.9},
+    {r:10,c:8,l:2,v:.72},{r:8,c:10,l:2,v:.55},{r:12,c:11,l:1,v:.4},{r:6,c:12,l:4,v:.86},{r:3,c:14,l:2,v:.64} ];
+  let notesHtml="", velHtml="";
+  notes.forEach(n=>{ notesHtml+='<div class="note'+(n.sel?" sel":"")+'" data-key="Clip1" style="left:'+(n.c/cols*100)+'%;width:'+(n.l/cols*100-0.6)
+      +'%;top:'+((n.r+0.5)*rowH)+'%"></div>';
+    velHtml+='<div class="vb'+(n.sel?" sel":"")+'" data-key="'+(n.sel?"VelocitySelectedOrHovered":"VelocityColor")+'" style="left:'+(n.c/cols*100)+'%;height:'+(18+n.v*14)+'px"><i></i></div>'; });
+  const proll='<div class="proll"><div class="loopbar"><div class="lb" style="left:0;width:50%"></div>'
+    +'<span class="lbl" style="left:3px">1</span><span class="lbl" style="left:28%">2</span>'
+    +'<span class="lbl" style="left:53%">3</span><span class="lbl" style="left:78%">4</span></div>'
+    +'<div class="prbody"><div class="keys">'+keysHtml+'</div>'
+    +'<div class="nwrap"><div class="ngrid">'+rowsHtml+glines+notesHtml+'</div></div></div>'
+    +'<div class="vel">'+velHtml+'</div></div>';
+  /* ---- Device view: drum rack + chain ---- */
+  const DRUM_LABELS=["Kick","Snare","Clap","Hat","","Tom","Rim","Perc","","","Ride","Crash","","","","FX"];
+  const padFilled=[0,1,2,3,5,6,7,10,11,15], padSel=0;
+  let pads="";
+  for(let i=0;i<16;i++){ const isF=padFilled.includes(i);
+    pads+='<div class="pad'+(isF?" filled":"")+(i===padSel?" sel":"")+'" data-key="'+(isF?"FilledDrumRackPad":"ControlBackground")+'">'+(DRUM_LABELS[i]||"")+'</div>'; }
+  let padscroll=""; for(let i=0;i<8;i++) padscroll+='<i data-key="DrumRackScroller'+(i%2?2:1)+'"></i>';
+  const devbody='<div class="devbody">'
+    +'<div class="drack"><div class="padgrid">'+pads+'</div><div class="scroller">'+padscroll+'</div></div>'
+    +'<div class="devchain">'
+    +'<span class="dev" data-key="ChosenDefault" style="background:var(--t-ChosenDefault);color:var(--t-ControlOnForeground)">Drum Rack</span>'
+    +'<span class="dev" data-key="ControlBackground">Operator</span><span class="dev" data-key="ControlBackground">Reverb</span><span class="dev" data-key="ControlBackground">EQ Eight</span>'
+    +'<span class="retro" data-key="RetroDisplayForeground">C1</span><span class="retro2" data-key="RetroDisplayForeground2">1 Bar</span><span class="dimtxt" data-key="TextDisabled">-inf dB</span>'
+    +'</div></div>';
+
+  /* ---- Audio view: sample editor ---- */
+  const swaveSvg=(()=>{ const n=120, amp=[];
+    for(let i=0;i<=n;i++){ const t=i/n, env=Math.pow(Math.sin(t*Math.PI),0.4);
+      amp.push(env*(2.4 + Math.abs(Math.sin(i*0.5))*3.2 + Math.abs(Math.sin(i*0.17))*2.4 + Math.abs(Math.sin(i*1.9))*1.2)); }
+    let top="", bot="";
+    amp.forEach((a,i)=>{ top+=(i/n*100).toFixed(2)+","+(10-a).toFixed(2)+" "; });
+    for(let i=amp.length-1;i>=0;i--) bot+=(i/n*100).toFixed(2)+","+(10+amp[i]).toFixed(2)+" ";
+    const pts=top+bot;
+    return '<svg class="swave" viewBox="0 0 100 20" preserveAspectRatio="none">'
+      +'<defs><clipPath id="loopclip"><rect x="0" y="0" width="50" height="20"/></clipPath></defs>'
+      +'<polygon points="'+pts+'" fill="var(--t-DimmedWaveformColor,#9a9a9a)"/>'
+      +'<polygon points="'+pts+'" fill="var(--t-WaveformColor,#e0e0e0)" clip-path="url(#loopclip)"/></svg>'; })();
+  const whots='<div class="whot" data-key="WaveformColor" style="left:0;width:50%"></div>'
+    +'<div class="whot" data-key="DimmedWaveformColor" style="left:50%;width:50%"></div>';
+  let sgl="", warps="", sruler="";
+  for(let b=1;b<8;b++) sgl+='<div class="sgl'+(b%2===0?" bar":"")+'" data-key="'+(b%2===0?"GridGuideline":"GridLineBase")+'" style="left:'+(b/8*100)+'%"></div>';
+  for(let b=0;b<=8;b++) warps+='<div class="warp" style="left:'+(b/8*100)+'%"><i></i></div>';
+  for(let b=0;b<8;b++) sruler+='<div class="loc">'+(b+1)+'</div>';
+  const samped='<div class="samped">'
+    +'<div class="loopbar"><div class="lb" data-key="LoopColor" style="left:0;width:50%"></div></div>'
+    +'<div class="sampbody" data-key="DetailViewBackground">'+sgl+swaveSvg+warps+whots+'</div>'
+    +'<div class="ruler">'+sruler+'</div></div>';
+
+  /* ---- Arrangement view ---- */
+  const bars=8;
+  const wave=seed=>{ const n=90, amp=[];
+    for(let i=0;i<=n;i++){ const t=i/n, env=Math.pow(Math.sin(t*Math.PI),0.5);
+      amp.push(0.8 + env*(3.4 + Math.abs(Math.sin(i*0.55+seed))*3.1 + Math.abs(Math.sin(i*0.19+seed*2.3))*2.2 + Math.abs(Math.sin(i*1.7+seed*0.6))*1.1)); }
+    let top="", bot="";
+    amp.forEach((a,i)=>{ top+=(i/n*100).toFixed(2)+","+(10-a).toFixed(2)+" "; });
+    for(let i=amp.length-1;i>=0;i--) bot+=(i/n*100).toFixed(2)+","+(10+amp[i]).toFixed(2)+" ";
+    return '<svg class="wave" viewBox="0 0 100 20" preserveAspectRatio="none">'
+      +'<polygon points="'+top+bot+'" fill="rgba(0,0,0,.32)"/>'
+      +'<polyline points="'+top+'" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="0.4" vector-effect="non-scaling-stroke"/></svg>'; };
+  const mnotes=seed=>{ let s=""; for(let i=0;i<7;i++){ const x=4+i*13, y=15+((i*17+seed*23)%60); s+='<div class="note" style="left:'+x+'%;width:10%;top:'+y+'%"></div>'; } return s; };
+  const gl=(()=>{ let g=""; for(let b=1;b<bars;b++) g+='<div class="gl bar" data-key="GridGuideline" style="left:'+(b/bars*100)+'%"></div>'; return g; })();
+  const arrTracks=[
+    {n:"1 MIDI",dot:1,arm:1,auto:1,clips:[{s:0,l:2,c:1,t:"Intro",sel:1,midi:1},{s:3,l:3,c:5,t:"Verse",midi:1}]},
+    {n:"2 MIDI",dot:7,clips:[{s:1,l:4,c:7,t:"Pad",midi:1},{s:6,l:2,c:9,t:"Keys",midi:1}]},
+    {n:"3 Audio",dot:12,clips:[{s:0,l:4,c:12,t:"Drums"},{s:5,l:3,c:11,t:"Fill"}]},
+    {n:"4 Audio",dot:8,clips:[{s:2,l:4,c:8,t:"Bass"}]},
+    {n:"5 Audio",dot:4,clips:[{s:4,l:4,c:4,t:"Sub"}]},
+    {n:"A Reverb",ret:1,clips:[]},
+    {n:"Master",master:1,clips:[]} ];
+  let aruler='<div class="aruler" data-key="SurfaceBackground"><div class="brace" style="left:0;width:50%"></div>';
+  for(let b=0;b<bars;b++) aruler+='<div class="loc">'+(b+1)+'</div>';
+  aruler+='</div>';
+  let atracks="";
+  arrTracks.forEach(tr=>{
+    const dot = tr.ret||tr.master ? 'background:var(--t-SurfaceBackground,#4f4f4f)' : 'background:'+clipVar(tr.dot);
+    let head='<div class="ahead" data-key="SurfaceHighlight"><span class="tdot" style="'+dot+'"></span>'+tr.n
+      +'<s class="'+(tr.arm?"on":"")+'">'+(tr.arm?"●":"S")+'</s></div>';
+    let lane='<div class="alane" data-key="ArrangerGridTiles">'+gl;
+    tr.clips.forEach(cl=>{ const left=cl.s/bars*100, w=cl.l/bars*100-0.5;
+      const inner = cl.midi ? mnotes(cl.c) : wave(cl.c);
+      lane+='<div class="aclip'+(cl.sel?" sel":"")+'" data-key="Clip'+cl.c+'" style="left:'+left+'%;width:'+w+'%;background:'+clipVar(cl.c)+'"><span class="cn">'+cl.t+'</span>'+inner+'</div>'; });
+    lane+='<div class="playhead" style="left:30%"></div></div>';
+    atracks+='<div class="atrk'+(tr.clips.some(c=>c.sel)?" seltrk":"")+'">'+head+lane+'</div>';
+    if(tr.auto){
+      const bp=[{x:0,y:58},{x:18,y:58},{x:30,y:24},{x:50,y:62},{x:62,y:42},{x:80,y:42},{x:100,y:72}];
+      let agl=""; for(let b=1;b<bars;b++) agl+='<div class="agl" style="left:'+(b/bars*100)+'%"></div>';
+      const poly=bp.map(p=>p.x+","+p.y).join(" ");
+      const dots=bp.map(p=>'<div class="bp" style="left:'+p.x+'%;top:'+p.y+'%"></div>').join("");
+      atracks+='<div class="autolane"><div class="autohead" data-key="AutomationColor"><span class="sw"></span>Volume</div>'
+        +'<div class="autobody" data-key="AutomationGrid">'+agl
+        +'<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="'+poly+'" fill="none" stroke="var(--t-AutomationColor,#ff5559)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>'
+        +dots+'</div></div>';
+    } });
+  const arrHtml='<div class="arr">'+aruler+'<div class="atracks">'+atracks+'</div></div>';
+
+  const detail='<div class="dtabs">'
+    +'<span class="dtab on" data-pane="clip">MIDI</span>'
+    +'<span class="dtab" data-pane="audio">Audio</span>'
+    +'<span class="dtab" data-pane="dev">Device</span></div>'
+    +'<div class="dpane on" data-pane="clip">'+proll+'</div>'
+    +'<div class="dpane" data-pane="audio">'+samped+'</div>'
+    +'<div class="dpane" data-pane="dev">'+devbody+'</div>';
+
+  pv.innerHTML=
+    '<div class="bar" data-key="SurfaceBackground"><span class="dot play" data-key="ChosenPlay"></span><span class="dot rec" data-key="ChosenRecord"></span><span class="sq"></span>'
+    +'<span class="tempo" data-key="DisplayBackground">120.00</span><span class="pill" data-key="ChosenDefault">Key</span>'
+    +'<span class="dimtxt">C Major</span><span class="dimtxt">4 / 4</span></div>'
+    +'<div class="body">'
+    +'<div class="browser" data-key="SurfaceHighlight"><div class="hd" data-key="ControlForeground">Collections</div>'
+    +'<div class="brow" data-key="ControlForeground">Favourites</div><div class="brow" data-key="ControlForeground">Drums</div><div class="brow sel" data-key="SelectionBackground">Sounds</div>'
+    +'<div class="hd" data-key="ControlForeground">Library</div>'
+    +'<div class="brow" data-key="ControlForeground">Instruments</div><div class="brow" data-key="ControlForeground">Audio Effects</div><div class="brow" data-key="ControlForeground">MIDI Effects</div>'
+    +'<div class="brow dim" data-key="TextDisabled">Max for Live</div><div class="brow dim" data-key="TextDisabled">Plug-Ins</div></div>'
+    +'<div class="stage">'
+    +'<div class="view vsession on"><div class="session"><div class="grid">'+grid+master+'</div>'
+    +'<div class="mix">'+mix+'</div></div></div>'
+    +'<div class="view varr">'+arrHtml+'</div>'
+    +detail
+    +'</div></div>';
+
+  pv.querySelectorAll(".dtab").forEach(tab=>tab.addEventListener("click",()=>{
+    const id=tab.dataset.pane;
+    pv.querySelectorAll(".dtab").forEach(t=>t.classList.toggle("on",t===tab));
+    pv.querySelectorAll(".dpane").forEach(p=>p.classList.toggle("on",p.dataset.pane===id)); }));
+  document.querySelectorAll(".pvtab").forEach(tab=>tab.addEventListener("click",()=>{
+    const id=tab.dataset.view;
+    document.querySelectorAll(".pvtab").forEach(t=>t.classList.toggle("on",t===tab));
+    pv.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.classList.contains(id==="session"?"vsession":"varr"))); }));
+  pv.addEventListener("click",e=>{ const el=e.target.closest("[data-key]"); if(el) highlightKey(el.dataset.key); });
+  applyAllVars();
+  fitPreview();
+})();
+// scale the preview to fill its column (up or down); the Basic/Advanced panes stay fixed width
+function fitPreview(){
+  const pane=document.querySelector(".preview-pane"); if(!pane) return;
+  const avail=pane.clientWidth-36;                 // 18px padding each side
+  pv.style.zoom=Math.max(0.28,Math.min(2,avail/1100));
+}
+window.addEventListener("resize",fitPreview);
+</script>
+</body>
+</html>
